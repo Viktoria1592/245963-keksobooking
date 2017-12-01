@@ -6,55 +6,84 @@ var CHECKIN = ['12:00', '13:00', '14:00'];
 var CHECKOUT = ['12:00', '13:00', '14:00'];
 var FEATURES = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
 var price = {
-  'min': 1000, 'max': 1000000
+  'min': 1000,
+  'max': 1000000
 };
 var rooms = {
-  'min': 1, 'max': 5
+  'min': 1,
+  'max': 5
 };
-var location = {
-  'x': {
-    'min': 300, 'max': 900
-  },
-  'y': {
-    'min': 100, 'max': 500
-  }
+var locationXY = {
+  'minX': 300,
+  'maxX': 900,
+  'minY': 100,
+  'maxY': 500
 };
 
+// функция рандома
 var getRandomNumber = function (min, max) {
   var randomNumber = Math.floor(Math.random() * (max - min)) + min;
   return randomNumber;
 };
 
-var ads = document.querySelector('.map');
-ads.classList.remove('map--faded'); //  показываем окно настроек пользователя
+// создаю массив, состоящий из 8 сгенерированных JS объектов, которые будут описывать похожие объявления
+var generateCards = function () {
+  for (var i = 0; i < pinsAmount; i++) { /* ? */
+    var locationX = getRandomNumber(locationXY.minX, locationXY.maxX);
+    var locationY = getRandomNumber(locationXY.minY, locationXY.maxY);
 
-/*
-var similarListElement = userDialog.querySelector('.setup-similar-list'); // находим элемент, в который мы будем вставлять похожих магов
-var similarWizardTemplate = document.querySelector('#similar-wizard-template').content.querySelector('.setup-similar-item'); // Находим шаблон-мага, который мы будем копировать (мы используем весь DocumentFragment, находящийся в шаблоне)
-*/
-
-/*
-var getRandom = function (arr) { // функция генерации случайных элементов массива
-  var randomIndex = Math.round(Math.random() * (arr.length - 1)); // получаем случайное число от 0 до индекса последнего элемента
-  return arr[randomIndex];
+    cards[i] = {
+      author: {
+        avatar: 'img/avatars/user0' + (i + 1) + '.png'
+      },
+      offer: {
+        title: TITLES[getRandomNumber(0, 8)],
+        address: locationX + ', ' + locationY,
+        price: getRandomNumber(1000, 1000000),
+        type: getAppartmentTypes(), /* ? */
+        rooms: getRandomNumber(1, 6),
+        guests: getRandomNumber(1, 10),
+        checkin: CHECKIN[getRandomNumber(0, 3)],
+        checkout: CHECKIN[getRandomNumber(0, 3)],
+        features: FEATURES,
+        description: '',
+        photos: []
+      },
+      'location': {
+        'x': locationX,
+        'y': locationY
+      }
+    };
+  }
+  return cards;
 };
 
+var map = document.querySelector('.map');
+map.classList.remove('map--faded'); //  показываем окно настроек пользователя
+
+var mapPins = map.querySelector('.map__pins'); // находим элемент/карту в которую отрисовываем сгенерированные DOM-элементы
+var MapPinTemplate = document.querySelector('template').content.querySelector('.map__pin'); // Находим шаблон-кнопки в template, который будем копировать
+var MapCardTemplate = document.querySelector('template').content.querySelector('.map__card'); // Находим шаблон-описания в template, которы будем копировать
+var mapPinImage = document.querySelector('template').querySelector('img'); // Находим img в шаблоне-кнопке в template
+
+// Создает DOM элемент button на основе шаблона и данных объявления
+var renderPin = function (ad) {
+  var pinElement = mapPinTemplate.cloneNode(true);
+  pinElement.style.left = (ad.location.x - (mapPinImage.getAttribute('width') / 2)) + 'px'; // учитывает ширину картинки, смещается влево на пол-ширину
+  pinElement.style.top = (+mapPinImage.getAttribute('height') + ad.location.y + 22) + 'px'; // учитывает высоту метки с острым концом =22px и высоту картинки
+  pinElement.querySelector('img').src = ad.author.avatar;
+  return pinElement;
+};
+
+var fragment = document.createDocumentFragment();
+for (var i = 0; i < wizards.length; i++) {
+  fragment.appendChild(renderWizard(wizards[i])); /* ? */
+}
+mapPins.appendChild(fragment); // вставляем склонированного шаблон в нужное поле
+
+
+/*
 var wizards = [ // Массив магов с именами и цветами
-  {
-    name: getRandom(WIZARD_NAMES) + ' ' + getRandom(WIZARD_SURNAMES),
-    coatColor: getRandom(WIZARD_COAT_COLOR),
-    eyesColor: getRandom(WIZARD_EYES_COLOR)
-  },
-  {
-    name: getRandom(WIZARD_NAMES) + ' ' + getRandom(WIZARD_SURNAMES),
-    coatColor: getRandom(WIZARD_COAT_COLOR),
-    eyesColor: getRandom(WIZARD_EYES_COLOR)
-  },
-  {
-    name: getRandom(WIZARD_NAMES) + ' ' + getRandom(WIZARD_SURNAMES),
-    coatColor: getRandom(WIZARD_COAT_COLOR),
-    eyesColor: getRandom(WIZARD_EYES_COLOR)
-  },
   {
     name: getRandom(WIZARD_NAMES) + ' ' + getRandom(WIZARD_SURNAMES),
     coatColor: getRandom(WIZARD_COAT_COLOR),
@@ -62,22 +91,13 @@ var wizards = [ // Массив магов с именами и цветами
   }
 ];
 
-var renderWizard = function (wizard) { // Отрисуем шаблон-мага - функция создания DOM-элемента на основе JS-объекта
+var renderMapPin = function (wizard) { // Отрисуем шаблон-мага - функция создания DOM-элемента на основе JS-объекта
   var wizardElement = similarWizardTemplate.cloneNode(true); // клонируем содержимое шаблон-мага
 
   wizardElement.querySelector('.setup-similar-label').textContent = wizard.name; // добавляем имя в шаблон-мага
   wizardElement.querySelector('.wizard-coat').style.fill = wizard.coatColor; // добавляем цвет плаща в шаблон-мага
-  wizardElement.querySelector('.wizard-eyes').style.fill = wizard.eyesColor; // добавляем цвет глаз мага в шаблон-мага
-
   return wizardElement;
 };
-
-var fragment = document.createDocumentFragment();
-for (var i = 0; i < wizards.length; i++) {
-  fragment.appendChild(renderWizard(wizards[i]));
-}
-
-similarListElement.appendChild(fragment); // вставляем склонированного шаблон-мага в нужное поле
 
 document.querySelector('.setup-similar').classList.remove('hidden'); // показываем блок с похожими персонажами
 */

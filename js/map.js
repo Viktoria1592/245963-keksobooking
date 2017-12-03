@@ -5,6 +5,10 @@ var TYPES = ['flat', 'house', 'bungalo'];
 var CHECKIN = ['12:00', '13:00', '14:00'];
 var CHECKOUT = ['12:00', '13:00', '14:00'];
 var FEATURES = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
+var avatarNumber = {
+  'min': 1,
+  'max': 8
+};
 var price = {
   'min': 1000,
   'max': 1000000
@@ -20,84 +24,142 @@ var locationXY = {
   'maxY': 500
 };
 
-// функция рандома
+// функция рандома возвращает случайное число в заданном пределе
 var getRandomNumber = function (min, max) {
-  var randomNumber = Math.floor(Math.random() * (max - min)) + min;
-  return randomNumber;
+  return Math.round(Math.random() * (max - min) + min);
+};
+
+// функция рандома возвращает случайный элемент массива
+var getRandomItem = function (arr) {
+  var randomIndex = Math.round(Math.random() * (arr.length - 1)); // получаем случайное число от 0 до индекса последнего элемента
+  return arr[randomIndex];
+};
+
+// функция рандома возвращает случайный элемент массива без повторения
+var getRandomTitle = function (arr) {
+  var titleIndex = getRandomNumber(0, arr.length - 1);
+  return arr.splice(titleIndex, 1);
+};
+
+// функция для создания массива случайной длины
+var getRandomLength = function (arr) {
+  var featuresAmount = getRandomNumber(1, arr.length);
+  arr.length = featuresAmount;
+  return arr;
+};
+
+// функция для возвращения номер аватара пользователя
+var getAvatarNumber = function () {
+  return (avatarNumber.min <= avatarNumber.max) ? avatarNumber.min++ : 0;
+};
+
+// создаю объект, который будет описывать похожие объявления
+var objectOfAds = function () {
+  var locationX = getRandomNumber(locationXY.minX, locationXY.maxX);
+  var locationY = getRandomNumber(locationXY.minY, locationXY.maxY);
+  return {
+    'author': {
+      avatar: 'img/avatars/user0' + getAvatarNumber() + '.png'
+    },
+    'offer': {
+      'title': getRandomTitle(TITLES),
+      'address': locationX + ', ' + locationY,
+      'price': getRandomNumber(price.min, (price.max + 1)),
+      'type': getRandomItem(TYPES),
+      'rooms': getRandomNumber(rooms.min, (rooms.max + 1)),
+      'guests': getRandomNumber(1, 9),
+      'checkin': getRandomItem(CHECKIN),
+      'checkout': getRandomItem(CHECKOUT),
+      'features': getRandomLength(FEATURES), // ? - НЕ РАБОТАЕТ - одинаковое число для всех объектов
+      'description': '',
+      'photos': []
+    },
+    'location': {
+      'x': locationX,
+      'y': locationY
+    }
+  };
 };
 
 // создаю массив, состоящий из 8 сгенерированных JS объектов, которые будут описывать похожие объявления
-var generateCards = function () {
-  for (var i = 0; i < pinsAmount; i++) { /* ? */
-    var locationX = getRandomNumber(locationXY.minX, locationXY.maxX);
-    var locationY = getRandomNumber(locationXY.minY, locationXY.maxY);
-
-    cards[i] = {
-      author: {
-        avatar: 'img/avatars/user0' + (i + 1) + '.png'
-      },
-      offer: {
-        title: TITLES[getRandomNumber(0, 8)],
-        address: locationX + ', ' + locationY,
-        price: getRandomNumber(1000, 1000000),
-        type: getAppartmentTypes(), /* ? */
-        rooms: getRandomNumber(1, 6),
-        guests: getRandomNumber(1, 10),
-        checkin: CHECKIN[getRandomNumber(0, 3)],
-        checkout: CHECKIN[getRandomNumber(0, 3)],
-        features: FEATURES,
-        description: '',
-        photos: []
-      },
-      'location': {
-        'x': locationX,
-        'y': locationY
-      }
-    };
+var getArrayOfAds = function (adsAmount) {
+  var adsArr = [];
+  for (var j = 1; j <= adsAmount; j++) {
+    adsArr.push(objectOfAds());
   }
-  return cards;
+  return adsArr;
+};
+
+var countOfObject = 8; // количество js объектов нам необходимое в массиве по условию
+var arrayOfAds = getArrayOfAds(countOfObject); // массив из js объектов нам необходимых
+
+
+var mapPinTemplate = document.querySelector('template').content.querySelector('.map__pin'); // Находим шаблон-кнопки в template, который будем копировать
+var mapCardTemplate = document.querySelector('template').content.querySelector('.map__card'); // Находим шаблон-описания в template, которы будем копировать
+
+var pinWidth = 40; // ширина иконки
+var pinHeight = 40; // высота иконки
+var getPinHeight = function (locationX) { // функция учитывает ширину картинки, смещается влево на пол-ширину
+  return locationX - pinWidth / 2;
+};
+
+var getPinWidth = function (locationY) { // функция учитывает высоту метки с острым концом (18px) и высоту картинки
+  return locationY - pinHeight - 18;
+};
+
+// Создает DOM-элемент button на основе шаблона и данных объявления
+var renderPin = function (ads) {
+  var pinElement = mapPinTemplate.cloneNode(true); // клонируем содержимое кнопки из template
+  pinElement.querySelector('img').width = pinWidth;
+  pinElement.querySelector('img').height = pinHeight;
+  pinElement.style.left = getPinHeight(ads.location.x) + ads.location.y + 'px';
+  pinElement.style.top = getPinWidth(ads.location.x) + 'px';
+  pinElement.querySelector('img').src = ads.author.avatar;
+  return pinElement;
 };
 
 var map = document.querySelector('.map');
 map.classList.remove('map--faded'); //  показываем окно настроек пользователя
 
 var mapPins = map.querySelector('.map__pins'); // находим элемент/карту в которую отрисовываем сгенерированные DOM-элементы
-var MapPinTemplate = document.querySelector('template').content.querySelector('.map__pin'); // Находим шаблон-кнопки в template, который будем копировать
-var MapCardTemplate = document.querySelector('template').content.querySelector('.map__card'); // Находим шаблон-описания в template, которы будем копировать
-var mapPinImage = document.querySelector('template').querySelector('img'); // Находим img в шаблоне-кнопке в template
 
-// Создает DOM элемент button на основе шаблона и данных объявления
-var renderPin = function (ad) {
-  var pinElement = mapPinTemplate.cloneNode(true);
-  pinElement.style.left = (ad.location.x - (mapPinImage.getAttribute('width') / 2)) + 'px'; // учитывает ширину картинки, смещается влево на пол-ширину
-  pinElement.style.top = (+mapPinImage.getAttribute('height') + ad.location.y + 22) + 'px'; // учитывает высоту метки с острым концом =22px и высоту картинки
-  pinElement.querySelector('img').src = ad.author.avatar;
-  return pinElement;
-};
-
+// Отрисовываем сгенерированные DOM-элемент button в блок .map__pins
 var fragment = document.createDocumentFragment();
-for (var i = 0; i < wizards.length; i++) {
-  fragment.appendChild(renderWizard(wizards[i])); /* ? */
+for (var i = 0; i < arrayOfAds.length; i++) { // ? - до длинны массива из объектов
+  fragment.appendChild(renderPin(arrayOfAds[i])); // ? - добавляем DOM-элемент объявление из массива пообъектно
 }
-mapPins.appendChild(fragment); // вставляем склонированного шаблон в нужное поле
+mapPins.appendChild(fragment); // вставляем DOM-элемент button в нужное поле
 
-
-/*
-var wizards = [ // Массив магов с именами и цветами
-  {
-    name: getRandom(WIZARD_NAMES) + ' ' + getRandom(WIZARD_SURNAMES),
-    coatColor: getRandom(WIZARD_COAT_COLOR),
-    eyesColor: getRandom(WIZARD_EYES_COLOR)
-  }
-];
-
-var renderMapPin = function (wizard) { // Отрисуем шаблон-мага - функция создания DOM-элемента на основе JS-объекта
-  var wizardElement = similarWizardTemplate.cloneNode(true); // клонируем содержимое шаблон-мага
-
-  wizardElement.querySelector('.setup-similar-label').textContent = wizard.name; // добавляем имя в шаблон-мага
-  wizardElement.querySelector('.wizard-coat').style.fill = wizard.coatColor; // добавляем цвет плаща в шаблон-мага
-  return wizardElement;
+var getFeatures = function (item) {
+  return '<li class="feature feature--' + item + '"></li>';
 };
 
-document.querySelector('.setup-similar').classList.remove('hidden'); // показываем блок с похожими персонажами
-*/
+// создаём DOM-элемент объявление, заполняя его данными из объекта objectOfAds
+var renderMapCard = function (ads) { // Отрисуем шаблон-мага - функция создания DOM-элемента на основе JS-объекта
+  var mapCardElement = mapCardTemplate.cloneNode(true); // клонируем содержимое объявления из template
+
+  mapCardElement.querySelector('.popup__avatar').src = ads.author.avatar; // Замяем аватарку пользователя
+  mapCardElement.querySelector('h3').textContent = ads.offer.title;
+  mapCardElement.querySelector('small').textContent = ads.offer.address;
+  mapCardElement.querySelector('.popup__price').innerHTML = ads.offer.price + '&#x20bd;/ночь';
+  mapCardElement.querySelector('h4').textContent = ads.offer.type;
+  mapCardElement.querySelector('p:nth-of-type(3)').textContent = ads.offer.rooms + ' комнат для ' + ads.offer.guests + ' гостей';
+  mapCardElement.querySelector('p:nth-of-type(4)').textContent = 'Заезд после ' + ads.offer.checkin + ', выезд до ' + ads.offer.checkout;
+  mapCardElement.querySelector('.popup__features').insertAdjacentHTML('afterbegin', ads.offer.features.map(getFeatures).join(' ')); // - ? не работает
+  mapCardElement.querySelector('ul + p').textContent = ads.offer.description;
+
+  // Квартира для flat, Бунгало для bungalo, Дом для house
+  if (ads.offer.type === 'flat') {
+    mapCardElement.querySelector('h4').textContent = 'Квартира';
+  } else if (ads.offer.type === 'bungalo') {
+    mapCardElement.querySelector('h4').textContent = 'Бунгало';
+  } else {
+    mapCardElement.querySelector('h4').textContent = 'Дом';
+  }
+  return mapCardElement;
+};
+
+
+// вставляем полученный DOM-элемент в блок map перед блоком map__filters-containe
+var mapFiltersContainer = map.querySelector('.map__filters-container');
+map.insertBefore(renderMapCard(arrayOfAds[getRandomNumber(0, 9)]), mapFiltersContainer); // - ? выводит радномное объявление, иногда не выводит ничего!!

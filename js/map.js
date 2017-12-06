@@ -133,9 +133,11 @@ for (var i = 0; i < arrayOfAds.length; i++) { // ? - до длинны масс�
 }
 mapPins.appendChild(fragment); // вставляем DOM-элемент button в нужное поле
 
+/*
 var getFeatures = function (item) {
   return '<li class="feature feature--' + item + '"></li>';
 };
+*/
 
 var popupFeatures = mapCardTemplate.querySelector('.popup__features');
 

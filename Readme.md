@@ -1,7 +1,7 @@
 # Личный проект «Кексобукинг» [![Build status][travis-image]][travis-url]
 
 * Студент: [Siarhei Chaptsau](https://up.htmlacademy.ru/javascript/11/user/245963).
-* Наставник: [Иван Чернышев](https://htmlacademy.ru/profile/id77233).
+* Наставник: [Дмитрий Донецкий](https://htmlacademy.ru/profile/id497669).
 
 ---
 

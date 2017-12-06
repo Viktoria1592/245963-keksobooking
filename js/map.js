@@ -137,6 +137,17 @@ var getFeatures = function (item) {
   return '<li class="feature feature--' + item + '"></li>';
 };
 
+var popupFeatures = mapCardTemplate.querySelector('.popup__features');
+
+// удаляем дочерние элементы
+var deletePopupFeatures = function (featureElement) {
+  for (var j = 0; j < featureElement.children.length; j++) {
+    featureElement.removeChild(featureElement.children[j]);
+  }
+  return featureElement;
+};
+deletePopupFeatures(popupFeatures);
+
 // создаём DOM-элемент объявление, заполняя его данными из объекта objectOfAds
 var renderMapCard = function (ads) { // Отрисуем шаблон-мага - функция создания DOM-элемента на основе JS-объекта
   var mapCardElement = mapCardTemplate.cloneNode(true); // клонируем содержимое объявления из template
@@ -148,7 +159,7 @@ var renderMapCard = function (ads) { // Отрисуем шаблон-мага -
   mapCardElement.querySelector('h4').textContent = ads.offer.type;
   mapCardElement.querySelector('p:nth-of-type(3)').textContent = ads.offer.rooms + ' комнат для ' + ads.offer.guests + ' гостей';
   mapCardElement.querySelector('p:nth-of-type(4)').textContent = 'Заезд после ' + ads.offer.checkin + ', выезд до ' + ads.offer.checkout;
-  mapCardElement.querySelector('.popup__features').insertAdjacentHTML('afterbegin', ads.offer.features.map(getFeatures).join(' ')); // - ? некорректно работает
+  // mapCardElement.querySelector('.popup__features').insertAdjacentHTML('afterbegin', ads.offer.features.map(getFeatures).join(' ')); // - ?
   mapCardElement.querySelector('ul + p').textContent = ads.offer.description;
 
   // Квартира для flat, Бунгало для bungalo, Дом для house

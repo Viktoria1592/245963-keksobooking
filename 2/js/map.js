@@ -42,11 +42,13 @@ var getRandomTitle = function (arr) {
 };
 
 // функция для создания массива случайной длины
+/*
 var getRandomLength = function (arr) {
   var featuresAmount = getRandomNumber(1, arr.length);
   arr.length = featuresAmount;
   return arr;
 };
+*/
 
 // функция для возвращения номер аватара пользователя
 var getAvatarNumber = function () {
@@ -70,7 +72,8 @@ var objectOfAds = function () {
       'guests': getRandomNumber(1, 9),
       'checkin': getRandomItem(CHECKIN),
       'checkout': getRandomItem(CHECKOUT),
-      'features': getRandomLength(FEATURES), // ? - НЕ РАБОТАЕТ - одинаковое число для всех объектов
+      // 'features': getRandomLength(FEATURES), - одинаковое число для всех объектов
+      'features': FEATURES.splice(getRandomNumber(0, FEATURES.length), getRandomNumber(0, FEATURES.length + 1)),
       'description': '',
       'photos': []
     },
@@ -134,6 +137,17 @@ var getFeatures = function (item) {
   return '<li class="feature feature--' + item + '"></li>';
 };
 
+var popupFeatures = mapCardTemplate.querySelector('.popup__features');
+
+// удаляем дочерние элементы
+var deletePopupFeatures = function (featureElement) {
+  for (var j = 0; j < featureElement.children.length; j++) {
+    featureElement.removeChild(featureElement.children[j]);
+  }
+  return featureElement;
+};
+deletePopupFeatures(popupFeatures);
+
 // создаём DOM-элемент объявление, заполняя его данными из объекта objectOfAds
 var renderMapCard = function (ads) { // Отрисуем шаблон-мага - функция создания DOM-элемента на основе JS-объекта
   var mapCardElement = mapCardTemplate.cloneNode(true); // клонируем содержимое объявления из template
@@ -145,7 +159,7 @@ var renderMapCard = function (ads) { // Отрисуем шаблон-мага -
   mapCardElement.querySelector('h4').textContent = ads.offer.type;
   mapCardElement.querySelector('p:nth-of-type(3)').textContent = ads.offer.rooms + ' комнат для ' + ads.offer.guests + ' гостей';
   mapCardElement.querySelector('p:nth-of-type(4)').textContent = 'Заезд после ' + ads.offer.checkin + ', выезд до ' + ads.offer.checkout;
-  mapCardElement.querySelector('.popup__features').insertAdjacentHTML('afterbegin', ads.offer.features.map(getFeatures).join(' ')); // - ? не работает
+  // mapCardElement.querySelector('.popup__features').insertAdjacentHTML('afterbegin', ads.offer.features.map(getFeatures).join(' ')); // - ?
   mapCardElement.querySelector('ul + p').textContent = ads.offer.description;
 
   // Квартира для flat, Бунгало для bungalo, Дом для house
@@ -160,6 +174,6 @@ var renderMapCard = function (ads) { // Отрисуем шаблон-мага -
 };
 
 
-// вставляем полученный DOM-элемент в блок map перед блоком map__filters-containe
+// вставляем 1-й полученный DOM-элемент в блок map перед блоком map__filters-container
 var mapFiltersContainer = map.querySelector('.map__filters-container');
-map.insertBefore(renderMapCard(arrayOfAds[getRandomNumber(0, 9)]), mapFiltersContainer); // - ? выводит радномное объявление, иногда не выводит ничего!!
+map.insertBefore(renderMapCard(arrayOfAds[0]), mapFiltersContainer);

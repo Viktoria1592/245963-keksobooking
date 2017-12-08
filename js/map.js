@@ -72,7 +72,7 @@ var objectOfAds = function () {
       'guests': getRandomNumber(1, 9),
       'checkin': getRandomItem(CHECKIN),
       'checkout': getRandomItem(CHECKOUT),
-      'features': FEATURES.splice(getRandomNumber(0, FEATURES.length), getRandomNumber(0, FEATURES.length + 1)),
+      'features': FEATURES.splice(getRandomNumber(0, FEATURES.length), getRandomNumber(0, FEATURES.length + 1)), // -? проблемы
       'description': '',
       'photos': []
     },
@@ -100,12 +100,11 @@ var arrayOfAds = getArrayOfAds(countOfObject); // массив из js объе�
 var mapPinTemplate = document.querySelector('template').content.querySelector('.map__pin'); // Находим шаблон маркера в template, который будем копироват
 var map = document.querySelector('.map'); // карта
 var mapPins = map.querySelector('.map__pins'); // находим элемент-карту в которую отрисовываем сгенерированные DOM-элементы
-var mapPin = mapPins.querySelector('map__pin'); // шаблон маркера
+// var mapPin = mapPins.querySelector('map__pin'); // шаблон маркера
 
 var mapCardTemplate = document.querySelector('template').content.querySelector('.map__card'); // Находим шаблон объявления в template, которы будем копировать
 var popupFeatures = mapCardTemplate.querySelector('.popup__features');
 var articleElement = mapCardTemplate.cloneNode(true);
-var articleAside = document.querySelector('.map__card'); // шаблон объявления
 
 var pinWidth = 40; // ширина иконки
 var pinHeight = 40; // высота иконки
@@ -118,6 +117,22 @@ var getPinWidth = function (locationY) {
   return locationY - pinHeight - 18;
 };
 
+// функция снятия класса активного маркера
+var removeActive = function () {
+  var pin = document.querySelector('.map__pin--active');
+  if (pin !== null) {
+    pin.classList.remove('map__pin--active');
+  }
+};
+
+// функция удаления попапа
+var hideArticle = function () {
+  var removePopup = document.querySelector('.map__card'); // шаблон объявления
+  if (removePopup !== null) {
+    map.removeChild(removePopup);
+  }
+};
+
 // Создает DOM-элемент маркера на основе шаблона и данных объявления
 var renderPoint = function (ads) {
   var pinElement = mapPinTemplate.cloneNode(true); // клонируем содержимое маркера из template
@@ -126,6 +141,16 @@ var renderPoint = function (ads) {
   pinElement.style.left = getPinHeight(ads.location.x) + ads.location.y + 'px';
   pinElement.style.top = getPinWidth(ads.location.x) + 'px';
   pinElement.querySelector('img').src = ads.author.avatar;
+  pinElement.tabIndex = 1;
+  pinElement.className = 'map__pin'; // задал имя классу
+
+  // обработчик событий скрытия попапа на свой и смену акивного маркера по клику
+  pinElement.addEventListener('click', function () {
+    removeActive();
+    hideArticle();
+    pinElement.classList.add('map__pin--active');
+    renderArticle(ads); // отрисовка объявления-попапа соответствующего маркеру
+  });
   return pinElement;
 };
 
@@ -175,12 +200,22 @@ var renderArticle = function (ads) { // функция создания DOM-эл
   } else {
     articleElement.querySelector('h4').textContent = 'Дом';
   }
-  return articleElement;
+
+  // обработчик сыобытия закрытия попапа
+  var closePopupItem = articleElement.querySelector('.popup__close');
+  closePopupItem.addEventListener('click', function () {
+    closePopupItem.autofocus = false;
+    removeActive();
+    hideArticle();
+  });
+  closePopupItem.tabIndex = 1;
+  map.appendChild(articleElement); // на карту добавить отрисованный попап
+  // return articleElement; - устарело
 };
 
-// вставляем 1-й полученный DOM-элемент в блок map перед блоком map__filters-container
-var mapFiltersContainer = map.querySelector('.map__filters-container');
-map.insertBefore(renderArticle(arrayOfAds[0]), mapFiltersContainer);
+/* // вставляем 1-й полученный DOM-элемент в блок map перед блоком map__filters-container
+var mapFiltersContainer = map.querySelector('.map__filters-container');- устарело
+map.insertBefore(renderArticle(arrayOfAds[0]), mapFiltersContainer); - устарело */
 
 // ============ Обработка событий ============ //
 
@@ -189,18 +224,13 @@ var ENTER_KEYCODE = 13;
 var noticeForm = document.querySelector('notice__form');
 var formFieldset = document.querySelectorAll('fieldset');
 
-// Закрыть попап объявления по умолчанию
+/* // Закрыть попап объявления по умолчанию
 var closePopup = function () {
   articleElement.classList.add('hidden');
-
 };
-closePopup();
-
-// Открыть попап объявления
 var openPopup = function () {
   articleElement.classList.remove('hidden');
-
-};
+};*/
 
 // функция делает недоступными все поля форм по умолчанию
 var getDisabledMapAndForms = function () {
@@ -221,8 +251,8 @@ var getActivateMapAndForms = function () {
   for (var j = 0; j < formFieldset.length; j++) {
     formFieldset[j].removeAttribute('disabled', 'disabled');
   }
-  // mapPins.appendChild(fragment); // ? - добавить на карту скрытые маркера
 };
 
+var mapPinMain = map.querySelector('.map__pin--main');
 // обработчик события на блоке при отпускании кнопки мыши активирует поля и карту
-mapPin.addEventListener('mouseup', getActivateMapAndForms); // - ? в консоли addEventListener равно null
+mapPinMain.addEventListener('mouseup', getActivateMapAndForms); // - ? Не работает

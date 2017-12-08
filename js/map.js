@@ -219,8 +219,8 @@ map.insertBefore(renderArticle(arrayOfAds[0]), mapFiltersContainer); - уста�
 
 // ============ Обработка событий ============ //
 
-var ESC_KEYCODE = 27;
-var ENTER_KEYCODE = 13;
+// var ESC_KEYCODE = 27;
+// var ENTER_KEYCODE = 13;
 var noticeForm = document.querySelector('notice__form');
 var formFieldset = document.querySelectorAll('fieldset');
 

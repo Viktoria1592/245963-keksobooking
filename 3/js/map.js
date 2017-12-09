@@ -77,8 +77,8 @@ var objectOfAds = function () {
       'photos': []
     },
     'location': {
-      'x': locationX,
-      'y': locationY
+      x: locationX,
+      y: locationY
     }
   };
 };
@@ -98,27 +98,27 @@ var arrayOfAds = getArrayOfAds(countOfObject); // создаём массив-о
 // ============ Отрисовка DOM-элемент маркера отелей, но без вставки ============ //
 
 var mapPinTemplate = document.querySelector('template').content.querySelector('.map__pin'); // Находим шаблон маркера в template, который будем копироват
-var map = document.querySelector('.map'); // карта
+var map = document.querySelector('.map'); // общая поле = карта + настройки
 var mapPins = map.querySelector('.map__pins'); // находим элемент-карту в которую отрисовываем сгенерированные DOM-элементы
 
 var mapCardTemplate = document.querySelector('template').content.querySelector('.map__card'); // Находим шаблон объявления в template, которы будем копировать
 var popupFeatures = mapCardTemplate.querySelector('.popup__features');
 var articleElement = mapCardTemplate.cloneNode(true); // клонируем содержимое объявления из template
 
-// var ESC_KEYCODE = 27;
-// var ENTER_KEYCODE = 13;
+var ESC_KEYCODE = 27;
+var ENTER_KEYCODE = 13;
 var noticeForm = document.querySelector('.notice__form');
 var formFieldset = document.querySelectorAll('.fieldset');
 
 var pinWidth = 40; // ширина иконки
 var pinHeight = 40; // высота иконки
 // функция учитывает ширину картинки, смещается влево на пол-ширину
-var getPinHeight = function (locationX) {
-  return locationX - pinWidth / 2;
+var getPinWidth = function (x) {
+  return x - pinWidth / 2;
 };
-// функция учитывает высоту маркера с острым концом (18px) и высоту картинки
-var getPinWidth = function (locationY) {
-  return locationY - pinHeight - 18;
+// функция учитывает высоту маркера и высоту картинки
+var getPinHeight = function (y) {
+  return y - pinHeight;
 };
 
 // функция снятия класса активного маркера
@@ -132,7 +132,23 @@ var removeActive = function () {
 var hideArticle = function () {
   var removePopup = document.querySelector('.map__card'); // шаблон объявления-попап
   if (removePopup !== null) {
-    map.removeChild(removePopup);
+    mapPins.removeChild(removePopup); // map.
+  }
+};
+
+// закрываем попап Esc и убираем активный класс
+var onPopupEscPress = function (evt) {
+  if (evt.keyCode === ESC_KEYCODE) {
+    removeActive();
+    hideArticle();
+  }
+};
+
+// закрываем попап Enter и убираем активный класс
+var onCloseEnterPress = function (evt) {
+  if (evt.keyCode === ENTER_KEYCODE) {
+    removeActive();
+    hideArticle();
   }
 };
 
@@ -141,17 +157,26 @@ var renderPoint = function (ads) {
   var pinElement = mapPinTemplate.cloneNode(true); // клонируем содержимое маркера из template
   pinElement.querySelector('img').width = pinWidth;
   pinElement.querySelector('img').height = pinHeight;
-  pinElement.style.left = getPinHeight(ads.location.x) + ads.location.y + 'px';
-  pinElement.style.top = getPinWidth(ads.location.x) + 'px';
+  pinElement.style.left = getPinWidth(ads.location.x) + 'px';
+  pinElement.style.top = getPinHeight(ads.location.y) + 'px';
   pinElement.querySelector('img').src = ads.author.avatar;
   pinElement.tabIndex = 1;
   pinElement.className = 'map__pin'; // задал имя классу
   // обработчик событий замены акивного маркера по клику и появление своего попапа
   pinElement.addEventListener('click', function () {
     removeActive(); // снимает активный класс у кого находит при клике на маркер
-    hideArticle(); // скрывает текущиё попап
+    hideArticle(); // скрывает текущий попап
     pinElement.classList.add('map__pin--active');
     renderArticle(ads); // отрисовка объявления-попапа соответствующего нажатому маркеру
+  });
+  // обработчик событий замены акивного маркера по клику и появление своего попапа при нажатии Enter
+  pinElement.addEventListener('keydown', function (evt) {
+    if (evt.keyCode === ENTER_KEYCODE) {
+      removeActive();
+      hideArticle();
+      pinElement.classList.add('map__pin--active');
+      renderArticle(ads);
+    }
   });
   return pinElement;
 };
@@ -178,7 +203,6 @@ var getFeatures = function (item) {
   return '<li class="feature feature--' + item + '"></li>';
 };
 
-
 // создаём DOM-элемент объявление, заполняя его данными из объекта objectOfAds
 var renderArticle = function (ads) { // функция создания DOM-элемента на основе JS-объекта
   articleElement.querySelector('.popup__avatar').src = ads.author.avatar; // Замяем аватарку пользователя
@@ -191,22 +215,24 @@ var renderArticle = function (ads) { // функция создания DOM-эл
   articleElement.querySelector('.popup__features').insertAdjacentHTML('afterbegin', ads.offer.features.map(getFeatures).join(' '));
   articleElement.querySelector('ul + p').textContent = ads.offer.description;
   // Квартира для flat, Бунгало для bungalo, Дом для house
-  if (ads.offer.type === 'flat') {
+  if (ads.offer.type === 'flat') { // Квартира для flat, Бунгало для bungalo, Дом для house
     articleElement.querySelector('h4').textContent = 'Квартира';
   } else if (ads.offer.type === 'bungalo') {
     articleElement.querySelector('h4').textContent = 'Бунгало';
   } else {
     articleElement.querySelector('h4').textContent = 'Дом';
   }
-  // обработчик сыобытия закрытия попапа
+  // обработчик события закрытия попапа и смены класса
   var closePopupItem = articleElement.querySelector('.popup__close');
   closePopupItem.addEventListener('click', function () {
     closePopupItem.autofocus = false;
     removeActive();
     hideArticle();
   });
+  // обработчик события закрытия попапа и убирает активный класс при нажатии Enter
+  closePopupItem.addEventListener('keydown', onCloseEnterPress);
   closePopupItem.tabIndex = 1;
-  map.appendChild(articleElement); // на карту добавить отрисованный попап
+  mapPins.appendChild(articleElement); // на карту добавить отрисованный попап - map.
   // return articleElement; - устарело
 };
 
@@ -246,3 +272,13 @@ var getActivateMapAndForms = function () {
 var mapPinMain = map.querySelector('.map__pin--main');
 // обработчик события на блоке при отпускании кнопки мыши активирует поля и карту
 mapPinMain.addEventListener('mouseup', getActivateMapAndForms);
+
+// обработчик события на блоке при нажатии ENTER
+mapPinMain.addEventListener('keydown', function (evt) {
+  if (evt.keyCode === ENTER_KEYCODE) {
+    getActivateMapAndForms();
+  }
+});
+
+// обработчик события закрытия попапа и убирает активный класса при ESC
+document.addEventListener('keydown', onPopupEscPress);

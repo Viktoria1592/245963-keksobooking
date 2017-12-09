@@ -105,8 +105,8 @@ var mapCardTemplate = document.querySelector('template').content.querySelector('
 var popupFeatures = mapCardTemplate.querySelector('.popup__features');
 var articleElement = mapCardTemplate.cloneNode(true); // клонируем содержимое объявления из template
 
-var ESC_KEYCODE = 27;
-var ENTER_KEYCODE = 13;
+// var ESC_KEYCODE = 27;
+// var ENTER_KEYCODE = 13;
 var noticeForm = document.querySelector('.notice__form');
 var formFieldset = document.querySelectorAll('.fieldset');
 

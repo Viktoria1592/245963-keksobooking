@@ -72,7 +72,7 @@ var objectOfAds = function () {
       'guests': getRandomNumber(1, 9),
       'checkin': getRandomItem(CHECKIN),
       'checkout': getRandomItem(CHECKOUT),
-      'features': FEATURES.splice(getRandomNumber(0, FEATURES.length), getRandomNumber(0, FEATURES.length + 1)), // -? проблемы
+      'features': FEATURES.splice(getRandomNumber(0, FEATURES.length), getRandomNumber(0, FEATURES.length + 1)),
       'description': '',
       'photos': []
     },
@@ -282,3 +282,26 @@ mapPinMain.addEventListener('keydown', function (evt) {
 
 // обработчик события закрытия попапа и убирает активный класса при ESC
 document.addEventListener('keydown', onPopupEscPress);
+
+// ============ Валидациия формы ============ //
+
+var checkIn = noticeForm.querySelector('#timein');
+var checkOut = noticeForm.querySelector('#timeout');
+
+// если поля заполнены неверно, то выделяются неверные поля красной рамкой
+var getBorderColor = function (elem) {
+  elem.style.borderWidth = '2px';
+  elem.style.borderColor = 'green';
+};
+// getBorderColor(noticeForm);
+
+
+// Событие изменения времени выезда
+checkIn.addEventListener('change', function () {
+  checkOut.selectedIndex = checkIn.selectedIndex; // изменяется порядковый номер выбранного элемента
+});
+
+// Событие изменения времени въезда
+checkOut.addEventListener('change', function () {
+  checkIn.selectedIndex = checkOut.selectedIndex;
+});

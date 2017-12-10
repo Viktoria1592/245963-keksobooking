@@ -72,7 +72,7 @@ var objectOfAds = function () {
       'guests': getRandomNumber(1, 9),
       'checkin': getRandomItem(CHECKIN),
       'checkout': getRandomItem(CHECKOUT),
-      'features': FEATURES.splice(getRandomNumber(0, FEATURES.length), getRandomNumber(0, FEATURES.length + 1)),
+      'features': FEATURES.splice(getRandomNumber(0, FEATURES.length), getRandomNumber(0, FEATURES.length)), // С любой позиции массива рандомно от 0й до 5й позиции (всего 6 и она не включается) удаляем количество эелментов массива от 0 до 5
       'description': '',
       'photos': []
     },
@@ -100,9 +100,9 @@ var arrayOfAds = getArrayOfAds(countOfObject); // создаём массив-о
 var mapPinTemplate = document.querySelector('template').content.querySelector('.map__pin'); // Находим шаблон маркера в template, который будем копироват
 var map = document.querySelector('.map'); // общая поле = карта + настройки
 var mapPins = map.querySelector('.map__pins'); // находим элемент-карту в которую отрисовываем сгенерированные DOM-элементы
+var mapFiltersContainer = map.querySelector('.map__filters-container');
 
 var mapCardTemplate = document.querySelector('template').content.querySelector('.map__card'); // Находим шаблон объявления в template, которы будем копировать
-var popupFeatures = mapCardTemplate.querySelector('.popup__features');
 var articleElement = mapCardTemplate.cloneNode(true); // клонируем содержимое объявления из template
 
 var ESC_KEYCODE = 27;
@@ -197,13 +197,13 @@ var deletePopupFeatures = function (featureElement) {
   }
   return featureElement;
 };
-deletePopupFeatures(popupFeatures);
+// deletePopupFeatures(popupFeatures);
 
 var getFeatures = function (item) {
   return '<li class="feature feature--' + item + '"></li>';
 };
 
-// создаём DOM-элемент объявление, заполняя его данными из объекта objectOfAds
+// создаём DOM-элемент объявление-попап, заполняя его данными из объекта objectOfAds
 var renderArticle = function (ads) { // функция создания DOM-элемента на основе JS-объекта
   articleElement.querySelector('.popup__avatar').src = ads.author.avatar; // Замяем аватарку пользователя
   articleElement.querySelector('h3').textContent = ads.offer.title;
@@ -212,9 +212,10 @@ var renderArticle = function (ads) { // функция создания DOM-эл
   articleElement.querySelector('h4').textContent = ads.offer.type;
   articleElement.querySelector('p:nth-of-type(3)').textContent = ads.offer.rooms + ' комнат для ' + ads.offer.guests + ' гостей';
   articleElement.querySelector('p:nth-of-type(4)').textContent = 'Заезд после ' + ads.offer.checkin + ', выезд до ' + ads.offer.checkout;
+  deletePopupFeatures(articleElement.querySelector('.popup__features')); // удаляем дочерние элементы
   articleElement.querySelector('.popup__features').insertAdjacentHTML('afterbegin', ads.offer.features.map(getFeatures).join(' '));
   articleElement.querySelector('ul + p').textContent = ads.offer.description;
-  // Квартира для flat, Бунгало для bungalo, Дом для house
+  // кириллицу выводит вместо латинницы
   if (ads.offer.type === 'flat') { // Квартира для flat, Бунгало для bungalo, Дом для house
     articleElement.querySelector('h4').textContent = 'Квартира';
   } else if (ads.offer.type === 'bungalo') {
@@ -235,10 +236,6 @@ var renderArticle = function (ads) { // функция создания DOM-эл
   mapPins.appendChild(articleElement); // на карту добавить отрисованный попап - map.
   // return articleElement; - устарело
 };
-
-/* // вставляем 1-й полученный DOM-элемент в блок map перед блоком map__filters-container
-var mapFiltersContainer = map.querySelector('.map__filters-container');- устарело
-map.insertBefore(renderArticle(arrayOfAds[0]), mapFiltersContainer); - устарело */
 
 // ============ Обработка событий ============ //
 
@@ -264,6 +261,7 @@ var getActivateMapAndForms = function () {
   mapPins.appendChild(fragment); // добавленте маркеров на карту, хранящихся в fragment
   map.classList.remove('map--faded');
   noticeForm.classList.remove('notice__form--disabled');
+  map.insertBefore(renderArticle(arrayOfAds[0]), mapFiltersContainer); // вставляем 1-й полученный DOM-элемент в общий map перед блоком map__filters-container о умолчанию
   for (var j = 0; j < formFieldset.length; j++) {
     formFieldset[j].removeAttribute('disabled', 'disabled');
   }
@@ -289,11 +287,11 @@ var checkIn = noticeForm.querySelector('#timein');
 var checkOut = noticeForm.querySelector('#timeout');
 
 // если поля заполнены неверно, то выделяются неверные поля красной рамкой
-var getBorderColor = function (elem) {
+/* var getBorderColor = function (elem) {
   elem.style.borderWidth = '2px';
-  elem.style.borderColor = 'green';
+  elem.style.borderColor = 'green'; // - ?
 };
-// getBorderColor(noticeForm);
+// getBorderColor(noticeForm); */
 
 
 // Событие изменения времени выезда

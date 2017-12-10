@@ -298,7 +298,7 @@ var minPriceForTypes = {
 // если поля заполнены неверно, то выделяются неверные поля красной рамкой
 var getBorderColor = function (elem) {
   elem.style.borderWidth = '2px';
-  elem.style.borderColor = 'red';
+  elem.style.borderColor = '#fa9';
 };
 
 // рамки в обычном состоянии
@@ -338,5 +338,31 @@ priceForNight.addEventListener('invalid', function () {
   } else {
     priceForNight.setCustomValidity('');
     resetBorderColor(priceForNight);
+  }
+});
+
+var roomNumber = noticeForm.querySelector('#room_number');
+var capacity = noticeForm.querySelector('#capacity');
+var сapacityOfRooms = {
+  '1': ['1'],
+  '2': ['2', '1'],
+  '3': ['3', '2', '1'],
+  '100': ['0']
+};
+
+roomNumber.addEventListener('change', function () {
+  if (capacity.options.length > 0) {
+    [].forEach.call(capacity.options, function (item) {
+      if (сapacityOfRooms[roomNumber.value][0] === item.value) { // пример: сapacityOfRooms[2][0] = '3', - третему и второму и первому дочерн эл-тов capacity.options
+        item.selected = true;
+      } else {
+        item.selected = false; // остальные не выбраны
+      }
+      if (сapacityOfRooms[roomNumber.value].indexOf(item.value) >= 0) { // пример: сapacityOfRooms[2].indexOf(все значения option перебираются)
+        item.hidden = false;
+      } else {
+        item.hidden = true; // если какого значения option нет в значении ключа сapacityOfRooms - оно скрывается
+      }
+    });
   }
 });

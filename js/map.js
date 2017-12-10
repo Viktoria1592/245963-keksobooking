@@ -261,7 +261,7 @@ var getActivateMapAndForms = function () {
   mapPins.appendChild(fragment); // добавленте маркеров на карту, хранящихся в fragment
   map.classList.remove('map--faded');
   noticeForm.classList.remove('notice__form--disabled');
-  map.insertBefore(renderArticle(arrayOfAds[0]), mapFiltersContainer); // вставляем 1-й полученный DOM-элемент в общий map перед блоком map__filters-container о умолчанию
+  map.insertBefore(renderArticle(arrayOfAds[0]), mapFiltersContainer); // - ? вставляем 1-й полученный DOM-элемент в общий map перед блоком map__filters-container о умолчанию
   for (var j = 0; j < formFieldset.length; j++) {
     formFieldset[j].removeAttribute('disabled', 'disabled');
   }
@@ -285,14 +285,20 @@ document.addEventListener('keydown', onPopupEscPress);
 
 var checkIn = noticeForm.querySelector('#timein');
 var checkOut = noticeForm.querySelector('#timeout');
+var priceForNight = noticeForm.querySelector('#price');
+var typeOfAccommodation = noticeForm.querySelector('#type');
 
 // если поля заполнены неверно, то выделяются неверные поля красной рамкой
-/* var getBorderColor = function (elem) {
-  elem.style.borderWidth = '2px';
-  elem.style.borderColor = 'green'; // - ?
+var getBorderColor = function (elem) {
+  elem.style.borderWidth = '10px'; // - ? тест
+  elem.style.borderColor = 'green'; // - ? тест
 };
-// getBorderColor(noticeForm); */
 
+// рамки в обычном состоянии
+var resetBorderColor = function (elem) {
+  elem.style.borderWidth = '';
+  elem.style.borderColor = '';
+};
 
 // Событие изменения времени выезда
 checkIn.addEventListener('change', function () {
@@ -302,4 +308,28 @@ checkIn.addEventListener('change', function () {
 // Событие изменения времени въезда
 checkOut.addEventListener('change', function () {
   checkIn.selectedIndex = checkOut.selectedIndex;
+});
+
+// Событие изменения мин цены для типов жилья
+typeOfAccommodation.addEventListener('change', function () {
+  if (typeOfAccommodation.value === 'flat') {
+    priceForNight.min = 1000;
+  } else if (typeOfAccommodation.value === 'bungalo') {
+    priceForNight.min = 5000;
+  } else if (typeOfAccommodation.value === 'palace') {
+    priceForNight.min = 1000;
+  } else {
+    priceForNight.min = 0;
+  }
+});
+
+// обработчиками валидации введенной суммы
+priceForNight.addEventListener('invalid', function () { // - ? не работает
+  if (priceForNight.validity.rangeUnderflow) {
+    priceForNight.setCustomValidity('Цена жилья ниже рекомендованной');
+    getBorderColor(priceForNight);
+  } else {
+    priceForNight.setCustomValidity('');
+    resetBorderColor(priceForNight);
+  }
 });

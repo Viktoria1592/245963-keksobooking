@@ -287,11 +287,18 @@ var checkIn = noticeForm.querySelector('#timein');
 var checkOut = noticeForm.querySelector('#timeout');
 var priceForNight = noticeForm.querySelector('#price');
 var typeOfAccommodation = noticeForm.querySelector('#type');
+// мин цена для типов жилья
+var minPriceForTypes = {
+  bungalo: 0,
+  flat: 1000,
+  house: 5000,
+  palace: 10000
+};
 
 // если поля заполнены неверно, то выделяются неверные поля красной рамкой
 var getBorderColor = function (elem) {
-  elem.style.borderWidth = '10px'; // - ? тест
-  elem.style.borderColor = 'green'; // - ? тест
+  elem.style.borderWidth = '2px';
+  elem.style.borderColor = 'red';
 };
 
 // рамки в обычном состоянии
@@ -310,24 +317,24 @@ checkOut.addEventListener('change', function () {
   checkIn.selectedIndex = checkOut.selectedIndex;
 });
 
-// Событие изменения мин цены для типов жилья
+// обработчик cобытия изменения мин цены для типов жилья
 typeOfAccommodation.addEventListener('change', function () {
-  if (typeOfAccommodation.value === 'flat') {
-    priceForNight.min = 1000;
-  } else if (typeOfAccommodation.value === 'bungalo') {
-    priceForNight.min = 5000;
-  } else if (typeOfAccommodation.value === 'palace') {
-    priceForNight.min = 1000;
-  } else {
-    priceForNight.min = 0;
+  for (var key in minPriceForTypes) {
+    if (key === typeOfAccommodation.value) {
+      priceForNight.min = minPriceForTypes[key];
+    }
   }
 });
 
 // обработчиками валидации введенной суммы
-priceForNight.addEventListener('invalid', function () { // - ? не работает
+priceForNight.addEventListener('invalid', function () {
+  getBorderColor(priceForNight);
   if (priceForNight.validity.rangeUnderflow) {
     priceForNight.setCustomValidity('Цена жилья ниже рекомендованной');
-    getBorderColor(priceForNight);
+  } else if (priceForNight.validity.rangeOverflow) {
+    priceForNight.setCustomValidity('Цена жилья слишком высока');
+  } else if (priceForNight.validity.valueMissing) {
+    priceForNight.setCustomValidity('Обязательное поле');
   } else {
     priceForNight.setCustomValidity('');
     resetBorderColor(priceForNight);

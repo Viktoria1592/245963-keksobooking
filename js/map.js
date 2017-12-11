@@ -100,7 +100,7 @@ var arrayOfAds = getArrayOfAds(countOfObject); // создаём массив-о
 var mapPinTemplate = document.querySelector('template').content.querySelector('.map__pin'); // Находим шаблон маркера в template, который будем копироват
 var map = document.querySelector('.map'); // общая поле = карта + настройки
 var mapPins = map.querySelector('.map__pins'); // находим элемент-карту в которую отрисовываем сгенерированные DOM-элементы
-var mapFiltersContainer = map.querySelector('.map__filters-container');
+// var mapFiltersContainer = map.querySelector('.map__filters-container');
 
 var mapCardTemplate = document.querySelector('template').content.querySelector('.map__card'); // Находим шаблон объявления в template, которы будем копировать
 var articleElement = mapCardTemplate.cloneNode(true); // клонируем содержимое объявления из template
@@ -205,7 +205,7 @@ var getFeatures = function (item) {
 
 // создаём DOM-элемент объявление-попап, заполняя его данными из объекта objectOfAds
 var renderArticle = function (ads) { // функция создания DOM-элемента на основе JS-объекта
-  articleElement.querySelector('.popup__avatar').src = ads.author.avatar; // Замяем аватарку пользователя
+  articleElement.querySelector('.popup__avatar').src = ads.author.avatar; // Заменяем аватарку пользователя
   articleElement.querySelector('h3').textContent = ads.offer.title;
   articleElement.querySelector('small').textContent = ads.offer.address;
   articleElement.querySelector('.popup__price').innerHTML = ads.offer.price + '&#x20bd;/ночь';
@@ -239,13 +239,28 @@ var renderArticle = function (ads) { // функция создания DOM-эл
 
 // ============ Обработка событий ============ //
 
-/* // Закрыть попап объявления по умолчанию
+var address = noticeForm.querySelector('#address');
+var mapPinMain = map.querySelector('.map__pin--main');
+var locationMain = { // координаты главного маркера-пина
+  x: 600,
+  y: 380
+};
+
+
+// функция внесения адрес-координат в форму по умолчанию - для тестирования формы
+var getAddress = function () {
+  address.value = locationMain.x + ', ' + locationMain.y;
+};
+
+/*
+// Закрыть попап объявления по умолчанию
 var closePopup = function () {
   articleElement.classList.add('hidden');
 };
 var openPopup = function () {
   articleElement.classList.remove('hidden');
-};*/
+};
+*/
 
 // функция делает недоступными все поля форм по умолчанию
 var getDisabledMapAndForms = function () {
@@ -261,13 +276,13 @@ var getActivateMapAndForms = function () {
   mapPins.appendChild(fragment); // добавленте маркеров на карту, хранящихся в fragment
   map.classList.remove('map--faded');
   noticeForm.classList.remove('notice__form--disabled');
-  map.insertBefore(renderArticle(arrayOfAds[0]), mapFiltersContainer); // - ? вставляем 1-й полученный DOM-элемент в общий map перед блоком map__filters-container о умолчанию
+  renderArticle(arrayOfAds[0]); // отрисовываем 1й попап по умолчанию в общий map перед блоком map__filters-container
   for (var j = 0; j < formFieldset.length; j++) {
     formFieldset[j].removeAttribute('disabled', 'disabled');
   }
+  getAddress();
 };
 
-var mapPinMain = map.querySelector('.map__pin--main');
 // обработчик события на блоке при отпускании кнопки мыши активирует поля и карту
 mapPinMain.addEventListener('mouseup', getActivateMapAndForms);
 
@@ -293,6 +308,14 @@ var minPriceForTypes = {
   flat: 1000,
   house: 5000,
   palace: 10000
+};
+var roomNumber = noticeForm.querySelector('#room_number');
+var capacity = noticeForm.querySelector('#capacity');
+var сapacityOfRooms = {
+  '1': ['1'],
+  '2': ['2', '1'],
+  '3': ['3', '2', '1'],
+  '100': ['0']
 };
 
 // если поля заполнены неверно, то выделяются неверные поля красной рамкой
@@ -341,15 +364,7 @@ priceForNight.addEventListener('invalid', function () {
   }
 });
 
-var roomNumber = noticeForm.querySelector('#room_number');
-var capacity = noticeForm.querySelector('#capacity');
-var сapacityOfRooms = {
-  '1': ['1'],
-  '2': ['2', '1'],
-  '3': ['3', '2', '1'],
-  '100': ['0']
-};
-
+// обратобчик события соответствия кол-ва комнат и мест
 roomNumber.addEventListener('change', function () {
   if (capacity.options.length > 0) {
     [].forEach.call(capacity.options, function (item) {

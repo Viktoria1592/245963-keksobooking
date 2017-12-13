@@ -63,4 +63,53 @@
 
   // обработчик события закрытия попапа и убирает активный класса при ESC
   document.addEventListener('keydown', window.card.onPopupEscPress);
+
+  // перетаскивание
+  mapPinMain.addEventListener('mousedown', function (evt) {
+    evt.preventDefault();
+    var startCoords = {
+      x: evt.clientX,
+      y: evt.clientY
+    };
+
+    var onMouseMove = function (moveEvt) {
+      moveEvt.preventDefault();
+
+      var shift = {
+        x: startCoords.x - moveEvt.clientX,
+        y: startCoords.y - moveEvt.clientY
+      };
+
+      startCoords = {
+        x: moveEvt.clientX,
+        y: moveEvt.clientY
+      };
+
+      var newY = mapPinMain.offsetTop - shift.y;
+      var newX = mapPinMain.offsetLeft - shift.x;
+      var coordsYOnForm;
+      var coordsXOnForm = newX - 40 / 2;
+
+      mapPinMain.style.left = newX + 'px';
+      if (newY > 650) {
+        mapPinMain.style.top = '650 px';
+        coordsYOnForm = 650;
+      } else if (newY <= 100) {
+        mapPinMain.style.top = '100 px';
+        coordsYOnForm = 100;
+      } else {
+        mapPinMain.style.top = newY + 'px';
+        coordsYOnForm = newY - 40;
+      }
+      address.value = coordsXOnForm + ', ' + coordsYOnForm;
+    };
+
+    var onMouseUp = function (upEvt) {
+      upEvt.preventDefault();
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+    };
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+  });
 })();

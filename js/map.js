@@ -74,7 +74,7 @@
       y: evt.clientY
     };
 
-    var onMouseMove = function (moveEvt) {
+    var onMainPinDrag = function (moveEvt) {
       moveEvt.preventDefault();
 
       var shift = {
@@ -116,10 +116,10 @@
 
     var onMouseUp = function (upEvt) {
       upEvt.preventDefault();
-      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mousemove', onMainPinDrag);
       document.removeEventListener('mouseup', onMouseUp);
     };
-    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mousemove', onMainPinDrag);
     document.addEventListener('mouseup', onMouseUp);
   });
 })();

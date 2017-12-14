@@ -10,14 +10,16 @@
   var map = document.querySelector('.map'); // общая поле = карта + настройки
   var mapPinMain = map.querySelector('.map__pin--main');
   var mapPins = map.querySelector('.map__pins'); // находим элемент-карту в которую отрисовываем сгенерированные DOM-элементы
-  var locationMain = { // координаты главного маркера-пина
-    x: 600,
-    y: 380
+  var locationMainInForm = { // координаты главного маркера-пина
+    x: 580,
+    y: 355
   };
+  var pinWidth = 40; // ширина иконки
+  var pinHeight = 40; // высота иконки пина
 
   // функция внесения адрес-координат в форму по умолчанию - для тестирования формы
   var getAddress = function () {
-    address.value = locationMain.x + ', ' + locationMain.y;
+    address.value = locationMainInForm.x + ', ' + locationMainInForm.y;
   };
 
   /*
@@ -85,23 +87,31 @@
         y: moveEvt.clientY
       };
 
-      var newY = mapPinMain.offsetTop - shift.y;
-      var newX = mapPinMain.offsetLeft - shift.x;
-      var coordsYOnForm;
-      var coordsXOnForm = newX - 40 / 2;
-
-      mapPinMain.style.left = newX + 'px';
-      if (newY > 650) {
-        mapPinMain.style.top = '650 px';
-        coordsYOnForm = 650;
-      } else if (newY <= 100) {
-        mapPinMain.style.top = '100 px';
-        coordsYOnForm = 100;
+      var newX = mapPinMain.offsetLeft - shift.x; // переменная для отображения положения текущего пина по оси абсцисс
+      if (newX > window.data.locationXY.maxX) { // ограничения для пина на крте по оси абсцисс
+        mapPinMain.style.left = '900 px';
+        locationMainInForm.x = window.data.locationXY.maxX;
+      } else if (newX < window.data.locationXY.minX) {
+        mapPinMain.style.left = '300 px';
+        locationMainInForm.x = window.data.locationXY.minX;
       } else {
-        mapPinMain.style.top = newY + 'px';
-        coordsYOnForm = newY - 40;
+        mapPinMain.style.left = newX + 'px'; // отображение текущей координаты х
+        locationMainInForm.x = newX - pinWidth / 2; // отображение координат для вывода в форму
       }
-      address.value = coordsXOnForm + ', ' + coordsYOnForm;
+
+      var newY = mapPinMain.offsetTop - shift.y; // переменная для отображения положения текущего пина по оси ординат
+      if (newY > window.data.locationXY.maxY) { // ограничения для пина на крте по оси ординат
+        mapPinMain.style.top = '500 px';
+        locationMainInForm.y = window.data.locationXY.maxY;
+      } else if (newY < window.data.locationXY.minY) {
+        mapPinMain.style.top = '100 px';
+        locationMainInForm.y = window.data.locationXY.minY;
+      } else {
+        mapPinMain.style.top = newY + 'px'; // отображение текущей координаты у
+        locationMainInForm.y = newY - pinHeight / 2; // отображение координат для вывода в форму
+      }
+
+      getAddress(); // вывод текущих координат главного пина в форму
     };
 
     var onMouseUp = function (upEvt) {

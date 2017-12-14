@@ -78,6 +78,7 @@
   // перенос в глобальную область видимости
   window.data = {
     getRandomNumber: getRandomNumber,
-    objectOfAds: objectOfAds
+    objectOfAds: objectOfAds,
+    locationXY: locationXY
   };
 })();

@@ -19,6 +19,8 @@
     return y - pinHeight;
   };
 
+  // var pinElement = mapPinTemplate.cloneNode(true); // клонируем содержимое маркера из template - НЕ РАБОТАЕТ СНАРУЖИ ФУНКЦИИ ??
+
   // Создает DOM-элемент маркера на основе шаблона и данных объявления
   var renderPoint = function (ads) {
     var pinElement = mapPinTemplate.cloneNode(true); // клонируем содержимое маркера из template
@@ -32,8 +34,9 @@
 
     // обработчик событий замены акивного маркера по клику и появление своего попапа
     pinElement.addEventListener('click', function () {
-      window.card.removeActive(); // снимает активный класс у кого находит при клике на маркер
-      window.card.hideArticle(); // скрывает текущий попап
+      // window.card.removeActive(); // снимает активный класс у кого находит при клике на маркер
+      // window.card.hideArticle(); // скрывает текущий попап
+      window.showCard();
       pinElement.classList.add('map__pin--active');
       window.card.renderArticle(ads); // отрисовка объявления-попапа соответствующего нажатому маркеру
     });
@@ -41,8 +44,9 @@
     // обработчик событий замены акивного маркера по клику и появление своего попапа при нажатии Enter
     pinElement.addEventListener('keydown', function (evt) {
       if (evt.keyCode === ENTER_KEYCODE) {
-        window.card.removeActive();
-        window.card.hideArticle();
+        // window.card.removeActive();
+        // window.card.hideArticle();
+        window.showCard();
         pinElement.classList.add('map__pin--active');
         window.card.renderArticle(ads);
       }
@@ -58,6 +62,7 @@
 
   // перенос в глобальную область видимости
   window.pin = {
-    fragment: fragment
+    fragment: fragment,
+    renderPoint: renderPoint
   };
 })();

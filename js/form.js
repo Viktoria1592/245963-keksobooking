@@ -120,7 +120,7 @@
   // Функция вывода ошибки при отправке
   var errorHandler = function (errorMessage) {
     var node = document.createElement('div');
-    node.style = 'z-index: 100; margin: 0 auto; text-align: center; background-color: red;';
+    node.style = 'z-index: 100; margin: 0 auto; text-align: center; background-color: red;'; // временно
     node.style.position = 'absolute';
     node.style.left = 0;
     node.style.right = 0;
@@ -128,8 +128,6 @@
     node.textContent = errorMessage;
     document.body.insertAdjacentElement('afterbegin', node);
   };
-
-  window.backend.save(successHandler, errorHandler);
 
   noticeForm.addEventListener('submit', function (evt) {
     window.backend.save(new FormData(noticeForm), function () { // добавление данных формы для отправки через добавление в конструктор new FormData()

@@ -17,7 +17,7 @@
   var pinWidth = 40; // ширина иконки
   var pinHeight = 40; // высота иконки пина
 
-  // функция внесения адрес-координат в форму по умолчанию - для тестирования формы
+  // функция внесения адрес-координат в форму по умолчанию
   var getAddress = function () {
     address.value = locationMainInForm.x + ', ' + locationMainInForm.y;
   };
@@ -50,7 +50,8 @@
     for (var j = 0; j < formFieldset.length; j++) {
       formFieldset[j].removeAttribute('disabled', 'disabled');
     }
-    getAddress();
+    getAddress(); // внесение адрес-координат в форму
+    window.showCard();
   };
 
   // обработчик события на блоке при отпускании кнопки мыши активирует поля и карту

@@ -19,6 +19,8 @@
     return y - pinHeight;
   };
 
+  // var pinElement = mapPinTemplate.cloneNode(true); // клонируем содержимое маркера из template - НЕ РАБОТАЕТ СНАРУЖИ ФУНКЦИИ ??
+
   // Создает DOM-элемент маркера на основе шаблона и данных объявления
   var renderPoint = function (ads) {
     var pinElement = mapPinTemplate.cloneNode(true); // клонируем содержимое маркера из template
@@ -58,6 +60,7 @@
 
   // перенос в глобальную область видимости
   window.pin = {
-    fragment: fragment
+    fragment: fragment,
+    renderPoint: renderPoint
   };
 })();

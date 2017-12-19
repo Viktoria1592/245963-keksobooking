@@ -1,8 +1,8 @@
 'use strict';
 
-// модуль для показа карточки выбранного жилья по нажатию на метку на карте
+// модуль функций для работаты с сервером данных
 (function () {
-  var SERVER_URL = 'https://1510.dump.academy/keksobooking';
+  var SERVER_URL = 'https://1510.dump.academy/keksobooking/data';
 
   var setup = function (onLoad, onError) {
     var xhr = new XMLHttpRequest();
@@ -21,20 +21,18 @@
     xhr.addEventListener('timeout', function () { // обработчик для истечения заданного времени
       onError('Запрос не успел выполниться за ' + xhr.timeout + 'мс');
     });
-
     xhr.timeout = 10000; // 10s
-
     return xhr;
   };
 
   // функции для глобальной области видимости
   window.backend = {
-    save: function (data, onLoad, onError) {
+    save: function (data, onLoad, onError) { // метод для отправки данных форм на сервер
       var xhr = setup(onLoad, onError);
       xhr.open('POST', SERVER_URL);
       xhr.send(data); // объект FormData, содержит данные формы
     },
-    load: function (onLoad, onError) {
+    load: function (onLoad, onError) { // метод для загрузки данных
       var xhr = setup(onLoad, onError);
       xhr.open('GET', SERVER_URL + '/data');
       xhr.send();

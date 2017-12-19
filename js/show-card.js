@@ -5,7 +5,6 @@
   window.showCard = function () {
     window.card.removeActive();
     window.card.hideArticle();
-    // window.card.renderArticle(ads);
     document.addEventListener('keydown', window.card.onPopupEscPress);
   };
   /*

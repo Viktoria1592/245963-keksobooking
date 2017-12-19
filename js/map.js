@@ -51,7 +51,6 @@
       formFieldset[j].removeAttribute('disabled', 'disabled');
     }
     getAddress(); // внесение адрес-координат в форму
-    window.showCard();
   };
 
   // обработчик события на блоке при отпускании кнопки мыши активирует поля и карту

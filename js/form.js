@@ -34,23 +34,51 @@
     elem.style.borderColor = '';
   };
 
+  // ----- Функция синхронизации полей времени заезда и выезда ----- //
+
+  var syncValues = function (element, value) {
+    element.value = value;
+  };
+
   // Событие изменения времени выезда
   checkIn.addEventListener('change', function () {
-    checkOut.selectedIndex = checkIn.selectedIndex; // изменяется порядковый номер выбранного элемента
+    // checkOut.selectedIndex = checkIn.selectedIndex;
+    window.synchronizeFields(checkOut, checkIn, window.data.CHECKOUT, window.data.CHECKIN, syncValues); // изменяется порядковый номер выбранного элемента
   });
 
   // Событие изменения времени въезда
   checkOut.addEventListener('change', function () {
-    checkIn.selectedIndex = checkOut.selectedIndex;
+    // checkIn.selectedIndex = checkOut.selectedIndex;
+    window.synchronizeFields(checkIn, checkOut, window.data.CHECKIN, window.data.CHECKOUT, syncValues);
   });
+
+  // ----- Функция синхронизации типа жилья и минимальной цены ----- //
+
+  var syncValueWithMin = function (element, value) {
+    element.min = value;
+  };
+
+  // массив ключей из массива minPriceForTypes
+  var arrOfTypes = Object.keys(minPriceForTypes);
+
+  // массив значений ключей из массива minPriceForTypes
+  var getValues = function (keys, object) {
+    var arr = [];
+    for (var i = 0; i < keys.length; i++) {
+      arr.push(object[keys[i]]);
+    }
+    return arr;
+  };
 
   // обработчик cобытия изменения мин цены для типов жилья
   typeOfAccommodation.addEventListener('change', function () {
-    for (var key in minPriceForTypes) {
+    // Односторонняя синхронизация значения первого поля с минимальным значением второго
+    window.synchronizeFields(priceForNight, typeOfAccommodation, getValues(arrOfTypes, minPriceForTypes), arrOfTypes, syncValueWithMin);
+    /* for (var key in minPriceForTypes) {
       if (key === typeOfAccommodation.value) {
         priceForNight.min = minPriceForTypes[key];
       }
-    }
+    } */
   });
 
   // обработчиками валидации введенной суммы
@@ -68,7 +96,8 @@
     }
   });
 
-  // обратобчик события соответствия кол-ва комнат и мест
+  // ----- обратобчик события соответствия кол-ва комнат и мест ----- //
+
   roomNumber.addEventListener('change', function () {
     if (capacity.options.length > 0) {
       [].forEach.call(capacity.options, function (item) {
@@ -85,4 +114,5 @@
       });
     }
   });
+
 })();

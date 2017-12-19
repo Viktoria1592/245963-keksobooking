@@ -79,6 +79,8 @@
   window.data = {
     getRandomNumber: getRandomNumber,
     objectOfAds: objectOfAds,
-    locationXY: locationXY
+    locationXY: locationXY,
+    CHECKIN: CHECKIN,
+    CHECKOUT: CHECKOUT
   };
 })();

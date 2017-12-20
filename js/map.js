@@ -2,14 +2,12 @@
 
 // модуль, который работает с картой
 (function () {
-
   var ENTER_KEYCODE = 13;
   var noticeForm = document.querySelector('.notice__form');
   var address = noticeForm.querySelector('#address');
   var formFieldset = document.querySelectorAll('.fieldset');
   var map = document.querySelector('.map'); // общая поле = карта + настройки
   var mapPinMain = map.querySelector('.map__pin--main');
-  var mapPins = map.querySelector('.map__pins'); // находим элемент-карту в которую отрисовываем сгенерированные DOM-элементы
   var locationMainInForm = { // координаты главного маркера-пина
     x: 580,
     y: 355
@@ -32,6 +30,12 @@
   };
   */
 
+  // функция активации формы
+  var activate = function () {
+    map.classList.remove('map--faded');
+    noticeForm.classList.remove('notice__form--disabled');
+  };
+
   // функция делает недоступными все поля форм по умолчанию
   var getDisabledMapAndForms = function () {
     map.classList.add('map--faded');
@@ -43,10 +47,10 @@
 
   // событие активирует карту и форму
   var getActivateMapAndForms = function () {
-    mapPins.appendChild(window.pin.fragment); // добавленте маркеров на карту, хранящихся в fragment
-    map.classList.remove('map--faded');
-    noticeForm.classList.remove('notice__form--disabled');
-    window.card.renderArticle(window.card.arrayOfAds[0]); // отрисовываем 1й попап по умолчанию в общий map перед блоком map__filters-container
+    window.pin.init(); // инициализация пинов
+    window.pin.addPins(); // выводит пины на карту
+    activate(); // активирует карту и форму
+    window.showCard.renderArticle(window.data.get()[0]); // отрисовываем 1й попап по умолчанию из массива объявлений
     for (var j = 0; j < formFieldset.length; j++) {
       formFieldset[j].removeAttribute('disabled', 'disabled');
     }
@@ -64,7 +68,7 @@
   });
 
   // обработчик события закрытия попапа и убирает активный класса при ESC
-  document.addEventListener('keydown', window.card.onPopupEscPress);
+  document.addEventListener('keydown', window.showCard.onPopupEscPress);
 
   // перетаскивание
   mapPinMain.addEventListener('mousedown', function (evt) {
@@ -122,4 +126,9 @@
     document.addEventListener('mousemove', onMainPinDrag);
     document.addEventListener('mouseup', onMouseUp);
   });
+
+  // перенос в глобальную область видимости
+  window.map = {
+    getAddress: getAddress
+  };
 })();

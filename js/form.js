@@ -1,4 +1,5 @@
 'use strict';
+
 // модуль, который работает с формой объявления
 (function () {
   var noticeForm = document.querySelector('.notice__form');
@@ -6,6 +7,7 @@
   var checkOut = noticeForm.querySelector('#timeout');
   var priceForNight = noticeForm.querySelector('#price');
   var typeOfAccommodation = noticeForm.querySelector('#type');
+  var ESC_KEYCODE = 27;
   // мин цена для типов жилья
   var minPriceForTypes = {
     bungalo: 0,
@@ -72,13 +74,7 @@
 
   // обработчик cобытия изменения мин цены для типов жилья
   typeOfAccommodation.addEventListener('change', function () {
-    // Односторонняя синхронизация значения первого поля с минимальным значением второго
     window.synchronizeFields(priceForNight, typeOfAccommodation, getValues(arrOfTypes, minPriceForTypes), arrOfTypes, syncValueWithMin);
-    /* for (var key in minPriceForTypes) {
-      if (key === typeOfAccommodation.value) {
-        priceForNight.min = minPriceForTypes[key];
-      }
-    } */
   });
 
   // обработчиками валидации введенной суммы
@@ -115,25 +111,39 @@
     }
   });
 
-  // ----- Функция для работы с сервером ----- //
-
-  // Функция вывода ошибки при отправке
-  var errorHandler = function (errorMessage) {
-    var node = document.createElement('div');
-    node.style = 'z-index: 100; margin: 0 auto; text-align: center; background-color: red;'; // временно
-    node.style.position = 'absolute';
-    node.style.left = 0;
-    node.style.right = 0;
-    node.style.fontSize = '30px';
-    node.textContent = errorMessage;
-    document.body.insertAdjacentElement('afterbegin', node);
+  // ----- Обработчик для работы с сервером ----- //
+  var nodeDiv = document.createElement('div');
+  // Функция вывода при успешной отправке данных формы
+  var successSending = function () {
+    nodeDiv.style = 'z-index: 10; width: 300px; height: 25px; margin: 0 auto; padding: 15px; text-align: center; border-radius: 5%; background-color: white;';
+    nodeDiv.style.position = 'fixed';
+    nodeDiv.style.border = '2px solid green';
+    nodeDiv.style.top = '5%';
+    nodeDiv.style.left = 0;
+    nodeDiv.style.right = 0;
+    nodeDiv.style.fontSize = '20px';
+    nodeDiv.textContent = 'Данные успешно отправлены.';
+    document.body.insertAdjacentElement('afterbegin', nodeDiv);
   };
+
+  // закрытие сообщения об отправке данных ESC
+  document.addEventListener('keydown', function (evt) {
+    if (evt.keyCode === ESC_KEYCODE) {
+      nodeDiv.classList.add('hidden');
+    }
+  });
+
+  // закрытие сообщения об отправке данных при клике
+  nodeDiv.addEventListener('click', function (evt) {
+    evt.target.classList.add('hidden');
+  });
 
   noticeForm.addEventListener('submit', function (evt) {
     window.backend.save(new FormData(noticeForm), function () { // добавление данных формы для отправки через добавление в конструктор new FormData()
-      // при успешной загрузке данных на сервер сбрасывем значения формы на те, что были по умолчанию ??
-    }, errorHandler);
+      successSending(); // уведомление об успешной отправке формы
+      noticeForm.reset(); // при успешной загрузке данных на сервер сбрасывем значений формы
+      window.map.getAddress(); // внесение адрес-координат в форму
+    }, window.backend.errorHandler);
     evt.preventDefault(); // отменим действие формы по умолчанию
   });
-
 })();

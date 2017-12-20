@@ -2,7 +2,6 @@
 
 // модуль для отрисовки пина и взаимодействия с ним, без вставки
 (function () {
-
   // Находим шаблон маркера в template, который будем копировать
   var mapPinTemplate = document.querySelector('template').content.querySelector('.map__pin');
   var ENTER_KEYCODE = 13;
@@ -19,36 +18,24 @@
     return y - pinHeight;
   };
 
-  // var pinElement = mapPinTemplate.cloneNode(true); // клонируем содержимое маркера из template - НЕ РАБОТАЕТ СНАРУЖИ ФУНКЦИИ ??
-
   // Создает DOM-элемент маркера на основе шаблона и данных объявления
-  var renderPoint = function (ads) {
+  var renderPoint = function (ad) {
     var pinElement = mapPinTemplate.cloneNode(true); // клонируем содержимое маркера из template
     pinElement.querySelector('img').width = pinWidth;
     pinElement.querySelector('img').height = pinHeight;
-    pinElement.style.left = getPinWidth(ads.location.x) + 'px';
-    pinElement.style.top = getPinHeight(ads.location.y) + 'px';
-    pinElement.querySelector('img').src = ads.author.avatar;
+    pinElement.style.left = getPinWidth(ad.location.x) + 'px';
+    pinElement.style.top = getPinHeight(ad.location.y) + 'px';
+    pinElement.querySelector('img').src = ad.author.avatar;
     pinElement.tabIndex = 1;
     pinElement.className = 'map__pin'; // задал имя классу
-
     // обработчик событий замены акивного маркера по клику и появление своего попапа
     pinElement.addEventListener('click', function () {
-      // window.card.removeActive(); // снимает активный класс у кого находит при клике на маркер
-      // window.card.hideArticle(); // скрывает текущий попап
-      window.showCard();
-      pinElement.classList.add('map__pin--active');
-      window.card.renderArticle(ads); // отрисовка объявления-попапа соответствующего нажатому маркеру
+      window.showCard.next(pinElement, ad);
     });
-
     // обработчик событий замены акивного маркера по клику и появление своего попапа при нажатии Enter
     pinElement.addEventListener('keydown', function (evt) {
       if (evt.keyCode === ENTER_KEYCODE) {
-        // window.card.removeActive();
-        // window.card.hideArticle();
-        window.showCard();
-        pinElement.classList.add('map__pin--active');
-        window.card.renderArticle(ads);
+        window.showCard.next(pinElement, ad);
       }
     });
     return pinElement;
@@ -56,13 +43,24 @@
 
   // добавляем сгенерированный DOM-элемент маркера в fragment и храним его там. Добавляем на карту только при нажатии кнопки-активации
   var fragment = document.createDocumentFragment();
-  for (var i = 0; i < window.card.arrayOfAds.length; i++) {
-    fragment.appendChild(renderPoint(window.card.arrayOfAds[i])); // рендорим в массив-объявлений маркеры, каждому объявлению по маркеру
-  }
+  // инициализация элементов пинов
+  var init = function () {
+    var ads = window.data.get(); // возвращает новые пины из модуля data
+    for (var i = 0; i < ads.length; i++) {
+      fragment.appendChild(renderPoint(ads[i])); // рендорим в массив-объявлений маркеры, каждому объявлению по маркеру
+    }
+  };
+
+  // функция добавления пинов на карту, хранящихся в fragment
+  var addPins = function () {
+    document.querySelector('.map__pins').appendChild(fragment);
+  };
 
   // перенос в глобальную область видимости
   window.pin = {
     fragment: fragment,
-    renderPoint: renderPoint
+    renderPoint: renderPoint,
+    init: init,
+    addPins: addPins
   };
 })();

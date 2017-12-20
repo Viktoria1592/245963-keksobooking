@@ -1,4 +1,5 @@
 'use strict';
+
 //  модуль, который создает данные
 (function () {
   var TITLES = ['Большая уютная квартира', 'Маленькая неуютная квартира', 'Огромный прекрасный дворец', 'Маленький ужасный дворец', 'Красивый гостевой домик', 'Некрасивый негостеприимный домик', 'Уютное бунгало далеко от моря', 'Неуютное бунгало по колено в воде'];
@@ -24,6 +25,8 @@
     'minY': 100,
     'maxY': 500
   };
+  var ads = []; // переменная объявлений
+  window.backend.load(window.backend.successHandler, window.backend.errorHandler); // загрузка данных с сервера сразу
 
   // функция рандома возвращает случайное число в заданном пределе
   var getRandomNumber = function (min, max) {
@@ -75,12 +78,24 @@
     };
   };
 
+  // возвращает переменную объявлений
+  function get() {
+    return ads;
+  }
+
+  // переназначает переменную объявлений, старые объявления заменяет adsData из сервака
+  function set(newAds) {
+    ads = newAds;
+  }
+
   // перенос в глобальную область видимости
   window.data = {
     getRandomNumber: getRandomNumber,
     objectOfAds: objectOfAds,
     locationXY: locationXY,
     CHECKIN: CHECKIN,
-    CHECKOUT: CHECKOUT
+    CHECKOUT: CHECKOUT,
+    get: get,
+    set: set
   };
 })();

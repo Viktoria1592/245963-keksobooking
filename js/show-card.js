@@ -2,19 +2,11 @@
 
 // модуль для показа карточки выбранного жилья по нажатию на метку на карте
 (function () {
-
-  // ============ Отрисовка DOM-элемент объявление и вставка ============ //
-
   // Отрисовка DOM-элемент маркера отелей и вставка
   var map = document.querySelector('.map'); // общая поле = карта + настройки
   var mapPins = map.querySelector('.map__pins'); // находим элемент-карту в которую отрисовываем сгенерированные DOM-элементы
   var ENTER_KEYCODE = 13;
   var ESC_KEYCODE = 27;
-  // TODO перенести в модуль кард
-  // Находим шаблон объявления в template, которы будем копировать
-  // var mapCardTemplate = document.querySelector('template').content.querySelector('.map__card');
-  // клонируем содержимое объявления из template
-  // var articleElement = mapCardTemplate.cloneNode(true);
 
   // функция снятия класса активного маркера
   var removeActive = function () {
@@ -28,7 +20,7 @@
   var hideArticle = function () {
     var removePopup = document.querySelector('.map__card'); // шаблон объявления-попап
     if (removePopup !== null) {
-      mapPins.removeChild(removePopup); // map.
+      mapPins.removeChild(removePopup);
     }
   };
 
@@ -55,31 +47,28 @@
     }
     return featureElement;
   };
-  // deletePopupFeatures(popupFeatures);
 
   var getFeatures = function (item) {
     return '<li class="feature feature--' + item + '"></li>';
   };
 
-  // создаём DOM-элемент объявление-попап, заполняя его данными из объекта objectOfAds
-  var renderArticle = function (ads) { // функция создания DOM-элемента на основе JS-объекта
-    // TODO  - ads = ad
-
+  // создаём DOM-элемент объявление-попап, заполняя его данными из объекта objectOfads
+  var renderArticle = function (ad) {
     var articleElement = window.card.get(); // получили шаблон объявления
-    articleElement.querySelector('.popup__avatar').src = ads.author.avatar; // Заменяем аватарку пользователя
-    articleElement.querySelector('h3').textContent = ads.offer.title;
-    articleElement.querySelector('small').textContent = ads.offer.address;
-    articleElement.querySelector('.popup__price').innerHTML = ads.offer.price + ' RUR/ночь';
-    articleElement.querySelector('h4').textContent = ads.offer.type;
-    articleElement.querySelector('p:nth-of-type(3)').textContent = ads.offer.rooms + ' комнат для ' + ads.offer.guests + ' гостей';
-    articleElement.querySelector('p:nth-of-type(4)').textContent = 'Заезд после ' + ads.offer.checkin + ', выезд до ' + ads.offer.checkout;
+    articleElement.querySelector('.popup__avatar').src = ad.author.avatar; // Заменяем аватарку пользователя
+    articleElement.querySelector('h3').textContent = ad.offer.title;
+    articleElement.querySelector('small').textContent = ad.offer.address;
+    articleElement.querySelector('.popup__price').innerHTML = ad.offer.price + ' RUR/ночь';
+    articleElement.querySelector('h4').textContent = ad.offer.type;
+    articleElement.querySelector('p:nth-of-type(3)').textContent = ad.offer.rooms + ' комнат для ' + ad.offer.guests + ' гостей';
+    articleElement.querySelector('p:nth-of-type(4)').textContent = 'Заезд после ' + ad.offer.checkin + ', выезд до ' + ad.offer.checkout;
     deletePopupFeatures(articleElement.querySelector('.popup__features')); // удаляем дочерние элементы
-    articleElement.querySelector('.popup__features').insertAdjacentHTML('afterbegin', ads.offer.features.map(getFeatures).join(' '));
-    articleElement.querySelector('ul + p').textContent = ads.offer.description;
+    articleElement.querySelector('.popup__features').insertAdjacentHTML('afterbegin', ad.offer.features.map(getFeatures).join(' '));
+    articleElement.querySelector('ul + p').textContent = ad.offer.description;
     // кириллицу выводит вместо латинницы
-    if (ads.offer.type === 'flat') { // Квартира для flat, Бунгало для bungalo, Дом для house
+    if (ad.offer.type === 'flat') { // Квартира для flat, Бунгало для bungalo, Дом для house
       articleElement.querySelector('h4').textContent = 'Квартира';
-    } else if (ads.offer.type === 'bungalo') {
+    } else if (ad.offer.type === 'bungalo') {
       articleElement.querySelector('h4').textContent = 'Бунгало';
     } else {
       articleElement.querySelector('h4').textContent = 'Дом';
@@ -94,14 +83,14 @@
     // обработчик события закрытия попапа и убирает активный класс при нажатии Enter
     closePopupItem.addEventListener('keydown', onCloseEnterPress);
     closePopupItem.tabIndex = 1;
-    mapPins.appendChild(articleElement); // на карту добавить отрисованный попап - map.
-    // return articleElement; - устарело
+    mapPins.appendChild(articleElement); // на карту добавить отрисованный попап
   };
 
+  // функция отрисовывает новый попап по активному пину
   var next = function (element, card) {
-    removeActive();
-    hideArticle();
-    element.classList.add('map__pin--active');
+    removeActive(); // снимает активный класс у кого находит при клике на маркер
+    hideArticle(); // скрывает текущий попап
+    element.classList.add('map__pin--active'); // отрисовка попапа соответствующего нажатому маркеру
     renderArticle(card);
     document.addEventListener('keydown', onPopupEscPress);
   };

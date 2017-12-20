@@ -2,14 +2,12 @@
 
 // модуль, который работает с картой
 (function () {
-
   var ENTER_KEYCODE = 13;
   var noticeForm = document.querySelector('.notice__form');
   var address = noticeForm.querySelector('#address');
   var formFieldset = document.querySelectorAll('.fieldset');
   var map = document.querySelector('.map'); // общая поле = карта + настройки
   var mapPinMain = map.querySelector('.map__pin--main');
-  var mapPins = map.querySelector('.map__pins'); // находим элемент-карту в которую отрисовываем сгенерированные DOM-элементы
   var locationMainInForm = { // координаты главного маркера-пина
     x: 580,
     y: 355
@@ -32,6 +30,12 @@
   };
   */
 
+  // функция активации формы
+  var activate = function () {
+    map.classList.remove('map--faded');
+    noticeForm.classList.remove('notice__form--disabled');
+  };
+
   // функция делает недоступными все поля форм по умолчанию
   var getDisabledMapAndForms = function () {
     map.classList.add('map--faded');
@@ -44,14 +48,9 @@
   // событие активирует карту и форму
   var getActivateMapAndForms = function () {
     window.pin.init(); // инициализация пинов
-    mapPins.appendChild(window.pin.fragment); // добавленте пинов на карту, хранящихся в fragment
-    // TODO добавить фунцию addPins() - выводит пины на карту
-    map.classList.remove('map--faded');
-    noticeForm.classList.remove('notice__form--disabled');
-    // TODO добавить фунцию activate() - активирует форму из модуля form
-    window.showCard.renderArticle(window.data.get()[0]); // отрисовываем 1й попап по умолчанию в общий map перед блоком map__filters-container
-    // TODO взять массив объявдений из data.get вместо 52й строки
-
+    window.pin.addPins(); // выводит пины на карту
+    activate(); // активирует карту и форму
+    window.showCard.renderArticle(window.data.get()[0]); // отрисовываем 1й попап по умолчанию из массива объявлений
     for (var j = 0; j < formFieldset.length; j++) {
       formFieldset[j].removeAttribute('disabled', 'disabled');
     }

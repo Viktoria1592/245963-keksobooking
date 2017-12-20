@@ -34,21 +34,21 @@
 
     // обработчик событий замены акивного маркера по клику и появление своего попапа
     pinElement.addEventListener('click', function () {
-      // window.card.removeActive(); // снимает активный класс у кого находит при клике на маркер
-      // window.card.hideArticle(); // скрывает текущий попап
-      window.showCard();
+      window.showCard.next(pinElement, ads);
+      /* removeActive(); // снимает активный класс у кого находит при клике на маркер
+      hideArticle(); // скрывает текущий попап
       pinElement.classList.add('map__pin--active');
-      window.card.renderArticle(ads); // отрисовка объявления-попапа соответствующего нажатому маркеру
+      window.showCard.renderArticle(ads); // отрисовка объявления-попапа соответствующего нажатому маркеру*/
     });
 
     // обработчик событий замены акивного маркера по клику и появление своего попапа при нажатии Enter
     pinElement.addEventListener('keydown', function (evt) {
       if (evt.keyCode === ENTER_KEYCODE) {
-        // window.card.removeActive();
-        // window.card.hideArticle();
-        window.showCard();
+        window.showCard.next(pinElement, ads);
+        /* removeActive();
+        hideArticle();
         pinElement.classList.add('map__pin--active');
-        window.card.renderArticle(ads);
+        window.showCard.renderArticle(ads);*/
       }
     });
     return pinElement;

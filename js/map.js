@@ -46,7 +46,8 @@
     mapPins.appendChild(window.pin.fragment); // добавленте маркеров на карту, хранящихся в fragment
     map.classList.remove('map--faded');
     noticeForm.classList.remove('notice__form--disabled');
-    window.card.renderArticle(window.card.arrayOfAds[0]); // отрисовываем 1й попап по умолчанию в общий map перед блоком map__filters-container
+    window.backend.load(window.backend.successHandler, window.backend.errorHandler); // загрузка данных с сервера
+    window.showCard.renderArticle(window.card.arrayOfAds[0]); // отрисовываем 1й попап по умолчанию в общий map перед блоком map__filters-container
     for (var j = 0; j < formFieldset.length; j++) {
       formFieldset[j].removeAttribute('disabled', 'disabled');
     }
@@ -64,7 +65,7 @@
   });
 
   // обработчик события закрытия попапа и убирает активный класса при ESC
-  document.addEventListener('keydown', window.card.onPopupEscPress);
+  document.addEventListener('keydown', window.showCard.onPopupEscPress);
 
   // перетаскивание
   mapPinMain.addEventListener('mousedown', function (evt) {

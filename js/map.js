@@ -43,11 +43,15 @@
 
   // событие активирует карту и форму
   var getActivateMapAndForms = function () {
-    mapPins.appendChild(window.pin.fragment); // добавленте маркеров на карту, хранящихся в fragment
+    window.pin.init(); // инициализация пинов
+    mapPins.appendChild(window.pin.fragment); // добавленте пинов на карту, хранящихся в fragment
+    // TODO добавить фунцию addPins() - выводит пины на карту
     map.classList.remove('map--faded');
     noticeForm.classList.remove('notice__form--disabled');
-    window.backend.load(window.backend.successHandler, window.backend.errorHandler); // загрузка данных с сервера
-    window.showCard.renderArticle(window.card.arrayOfAds[0]); // отрисовываем 1й попап по умолчанию в общий map перед блоком map__filters-container
+    // TODO добавить фунцию activate() - активирует форму из модуля form
+    window.showCard.renderArticle(window.data.get()[0]); // отрисовываем 1й попап по умолчанию в общий map перед блоком map__filters-container
+    // TODO взять массив объявдений из data.get вместо 52й строки
+
     for (var j = 0; j < formFieldset.length; j++) {
       formFieldset[j].removeAttribute('disabled', 'disabled');
     }

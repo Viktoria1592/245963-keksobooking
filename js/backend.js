@@ -4,14 +4,8 @@
 (function () {
 
   // Функция загрузки данных при успешном результате
-  var successHandler = function (arrayOfAds) {
-    var fragmentNew = document.createDocumentFragment();
-    fragmentNew.appendChild(window.pin.renderPoint(arrayOfAds));
-
-    for (var i = 0; i < arrayOfAds.length; i++) {
-      fragmentNew.appendChild(window.showCard.renderArticle(arrayOfAds[i]));
-    }
-    document.querySelector('.map__pins').appendChild(fragmentNew);
+  var successHandler = function (adsData) { // в параметре данные из сервера
+    window.data.set(adsData);
   };
 
   // Функция вывода ошибки при отправке
@@ -36,7 +30,7 @@
 
     xhr.addEventListener('load', function () { // обработчик для успешного запроса
       if (xhr.status === 200) {
-        onLoad(xhr.response); // функция обратного вызова, которая срабатывает при успешном выполнении запроса
+        onLoad(xhr.response); // функция обратного вызова, которая срабатывает при успешном выполнении запроса, response - Ответ сервера
       } else {
         onError(xhr.response); // функция обратного вызова, которая срабатывает при неуспешном выполнении запроса
       }

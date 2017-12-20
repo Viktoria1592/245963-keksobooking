@@ -22,7 +22,7 @@
   // var pinElement = mapPinTemplate.cloneNode(true); // клонируем содержимое маркера из template - НЕ РАБОТАЕТ СНАРУЖИ ФУНКЦИИ ??
 
   // Создает DOM-элемент маркера на основе шаблона и данных объявления
-  var renderPoint = function (ads) {
+  var renderPoint = function (ads) { // TODO  - ad
     var pinElement = mapPinTemplate.cloneNode(true); // клонируем содержимое маркера из template
     pinElement.querySelector('img').width = pinWidth;
     pinElement.querySelector('img').height = pinHeight;
@@ -56,13 +56,19 @@
 
   // добавляем сгенерированный DOM-элемент маркера в fragment и храним его там. Добавляем на карту только при нажатии кнопки-активации
   var fragment = document.createDocumentFragment();
-  for (var i = 0; i < window.card.arrayOfAds.length; i++) {
-    fragment.appendChild(renderPoint(window.card.arrayOfAds[i])); // рендорим в массив-объявлений маркеры, каждому объявлению по маркеру
-  }
+
+  // инициализация элементов пинов
+  var init = function () {
+    var ads = window.data.get(); // возвращает новые пины из модуля даты
+    for (var i = 0; i < ads.length; i++) {
+      fragment.appendChild(renderPoint(ads[i])); // рендорим в массив-объявлений маркеры, каждому объявлению по маркеру
+    }
+  };
 
   // перенос в глобальную область видимости
   window.pin = {
     fragment: fragment,
-    renderPoint: renderPoint
+    renderPoint: renderPoint,
+    init: init
   };
 })();

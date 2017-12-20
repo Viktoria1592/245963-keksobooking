@@ -10,10 +10,11 @@
   var mapPins = map.querySelector('.map__pins'); // находим элемент-карту в которую отрисовываем сгенерированные DOM-элементы
   var ENTER_KEYCODE = 13;
   var ESC_KEYCODE = 27;
+  // TODO перенести в модуль кард
   // Находим шаблон объявления в template, которы будем копировать
-  var mapCardTemplate = document.querySelector('template').content.querySelector('.map__card');
+  // var mapCardTemplate = document.querySelector('template').content.querySelector('.map__card');
   // клонируем содержимое объявления из template
-  var articleElement = mapCardTemplate.cloneNode(true);
+  // var articleElement = mapCardTemplate.cloneNode(true);
 
   // функция снятия класса активного маркера
   var removeActive = function () {
@@ -62,6 +63,9 @@
 
   // создаём DOM-элемент объявление-попап, заполняя его данными из объекта objectOfAds
   var renderArticle = function (ads) { // функция создания DOM-элемента на основе JS-объекта
+    // TODO  - ads = ad
+
+    var articleElement = window.card.get(); // получили шаблон объявления
     articleElement.querySelector('.popup__avatar').src = ads.author.avatar; // Заменяем аватарку пользователя
     articleElement.querySelector('h3').textContent = ads.offer.title;
     articleElement.querySelector('small').textContent = ads.offer.address;

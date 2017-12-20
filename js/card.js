@@ -8,7 +8,7 @@
   // клонируем содержимое объявления из template
   var articleElement = mapCardTemplate.cloneNode(true); // перенёс -??
 
-/*
+  /*
   var getArrayOfAds = function (adsAmount) { // TODO перенести в data
     var adsArr = [];
     for (var j = 1; j <= adsAmount; j++) {
@@ -25,10 +25,8 @@
     return articleElement;
   }
 
-
   // перенос в глобальную область видимости
   window.card = {
-    //arrayOfAds: arrayOfAds,
     get: get
   };
 })();

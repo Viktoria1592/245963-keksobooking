@@ -122,4 +122,9 @@
     document.addEventListener('mousemove', onMainPinDrag);
     document.addEventListener('mouseup', onMouseUp);
   });
+
+  // перенос в глобальную область видимости
+  window.map = {
+    getAddress: getAddress
+  };
 })();

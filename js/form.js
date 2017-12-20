@@ -124,14 +124,17 @@
     node.style.position = 'absolute';
     node.style.left = 0;
     node.style.right = 0;
-    node.style.fontSize = '30px';
+    node.style.fontSize = '40px';
     node.textContent = errorMessage;
     document.body.insertAdjacentElement('afterbegin', node);
   };
 
+  // window.backend.load(successHandler, errorHandler);
+
   noticeForm.addEventListener('submit', function (evt) {
     window.backend.save(new FormData(noticeForm), function () { // добавление данных формы для отправки через добавление в конструктор new FormData()
-      // при успешной загрузке данных на сервер сбрасывем значения формы на те, что были по умолчанию ??
+      noticeForm.reset(); // при успешной загрузке данных на сервер сбрасывем значений формы
+      window.map.getAddress(); // внесение адрес-координат в форму
     }, errorHandler);
     evt.preventDefault(); // отменим действие формы по умолчанию
   });

@@ -2,7 +2,7 @@
 
 // модуль функций для работаты с сервером данных
 (function () {
-  var SERVER_URL = 'https://1510.dump.academy/keksobooking/data';
+  var SERVER_URL = 'https://1510.dump.academy/keksobooking';
 
   var setup = function (onLoad, onError) {
     var xhr = new XMLHttpRequest();

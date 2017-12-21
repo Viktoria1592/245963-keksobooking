@@ -58,7 +58,7 @@
     articleElement.querySelector('.popup__avatar').src = ad.author.avatar; // Заменяем аватарку пользователя
     articleElement.querySelector('h3').textContent = ad.offer.title;
     articleElement.querySelector('small').textContent = ad.offer.address;
-    articleElement.querySelector('.popup__price').innerHTML = ad.offer.price + ' RUR/ночь';
+    articleElement.querySelector('.popup__price').innerHTML = ad.offer.price + ' &#x20bd;/ночь';
     articleElement.querySelector('h4').textContent = ad.offer.type;
     articleElement.querySelector('p:nth-of-type(3)').textContent = ad.offer.rooms + ' комнат для ' + ad.offer.guests + ' гостей';
     articleElement.querySelector('p:nth-of-type(4)').textContent = 'Заезд после ' + ad.offer.checkin + ', выезд до ' + ad.offer.checkout;

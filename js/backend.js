@@ -5,13 +5,14 @@
   // Функция загрузки данных при успешном результате
   var successHandler = function (adsData) { // в параметре данные из сервера
     window.data.set(adsData);
+    window.pin.updateMap(adsData);
   };
 
   var ESC_KEYCODE = 27;
   var divMessage = document.createElement('div');
   // Функция вывода ошибки при отправке
   var errorHandler = function (errorMessage) {
-    divMessage.style = 'z-index: 10; width: 300px; height: 50px; margin: 0 auto; padding: 15px; text-align: center; border-radius: 10%; background-color: yellow;';
+    divMessage.style = 'z-index: 10; width: 300px; height: 20px; margin: 0 auto; padding: 15px; text-align: center; border-radius: 5%; background-color: yellow;';
     divMessage.style.position = 'absolute';
     divMessage.style.border = '2px solid red';
     divMessage.style.top = '10%';

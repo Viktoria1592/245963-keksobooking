@@ -55,6 +55,7 @@
       formFieldset[j].removeAttribute('disabled', 'disabled');
     }
     getAddress(); // внесение адрес-координат в форму
+    mapPinMain.removeEventListener('mouseup', getActivateMapAndForms); // удаляет обработчик для предотвращения вызова 1-го попапа при нажатии главного пина
   };
 
   // обработчик события на блоке при отпускании кнопки мыши активирует поля и карту

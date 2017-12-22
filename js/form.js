@@ -2,14 +2,13 @@
 
 // модуль, который работает с формой объявления
 (function () {
+  var ESC_KEYCODE = 27;
   var noticeForm = document.querySelector('.notice__form');
   var checkIn = noticeForm.querySelector('#timein');
   var checkOut = noticeForm.querySelector('#timeout');
   var priceForNight = noticeForm.querySelector('#price');
   var typeOfAccommodation = noticeForm.querySelector('#type');
-  var ESC_KEYCODE = 27;
-  // мин цена для типов жилья
-  var minPriceForTypes = {
+  var minPriceForTypes = { // мин цена для типов жилья
     bungalo: 0,
     flat: 1000,
     house: 5000,
@@ -23,6 +22,7 @@
     '3': ['3', '2', '1'],
     '100': ['0']
   };
+  var nodeDiv = document.createElement('div');
 
   // если поля заполнены неверно, то выделяются неверные поля красной рамкой
   var getBorderColor = function (elem) {
@@ -44,13 +44,11 @@
 
   // Событие изменения времени выезда
   checkIn.addEventListener('change', function () {
-    // checkOut.selectedIndex = checkIn.selectedIndex;
     window.synchronizeFields(checkOut, checkIn, window.data.CHECKOUT, window.data.CHECKIN, syncValues); // изменяется порядковый номер выбранного элемента
   });
 
   // Событие изменения времени въезда
   checkOut.addEventListener('change', function () {
-    // checkIn.selectedIndex = checkOut.selectedIndex;
     window.synchronizeFields(checkIn, checkOut, window.data.CHECKIN, window.data.CHECKOUT, syncValues);
   });
 
@@ -112,7 +110,7 @@
   });
 
   // ----- Обработчик для работы с сервером ----- //
-  var nodeDiv = document.createElement('div');
+
   // Функция вывода при успешной отправке данных формы
   var successSending = function () {
     nodeDiv.style = 'z-index: 10; width: 300px; height: 25px; margin: 0 auto; padding: 15px; text-align: center; border-radius: 5%; background-color: white;';

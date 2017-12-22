@@ -7,7 +7,6 @@
   var DEBOUNCE_INTERVAL = 500;
   // Находим шаблон маркера в template, который будем копировать
   var mapPinTemplate = document.querySelector('template').content.querySelector('.map__pin');
-  // var mapPin = document.querySelector('.map__pin');
   var mapPinMain = document.querySelector('.map__pin--main');
   var pinWidth = 40; // ширина иконки
   var pinHeight = 40; // высота иконки

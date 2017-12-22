@@ -2,12 +2,21 @@
 
 // модуль для отрисовки пина и взаимодействия с ним, без вставки
 (function () {
+  var ENTER_KEYCODE = 13;
+  var MAX_PINS = 5;
+  var DEBOUNCE_INTERVAL = 500;
   // Находим шаблон маркера в template, который будем копировать
   var mapPinTemplate = document.querySelector('template').content.querySelector('.map__pin');
-  var ENTER_KEYCODE = 13;
   var pinWidth = 40; // ширина иконки
   var pinHeight = 40; // высота иконки
-  var MAX_PINS = 5;
+
+  var mapFilters = document.querySelector('.map__filters');
+  var filterHousingType = mapFilters.querySelector('#housing-type');
+  var filterPrice = mapFilters.querySelector('#housing-price');
+  var filterRooms = mapFilters.querySelector('#housing-rooms');
+  var filterGuests = mapFilters.querySelector('#housing-guests');
+  var filterFeatures = mapFilters.querySelectorAll('#housing-features input[type="checkbox"]');
+  var dataCopy = []; // копия данных полученных с сервера перед началом каждой фильтрации
 
   // функция учитывает ширину картинки, смещается влево на пол-ширину
   var getPinWidth = function (x) {
@@ -31,12 +40,12 @@
     pinElement.className = 'map__pin'; // задал имя классу
     // обработчик событий замены акивного маркера по клику и появление своего попапа
     pinElement.addEventListener('click', function () {
-      window.showCard.next(pinElement, ad);
+      window.showCard.renderNextPopap(pinElement, ad);
     });
     // обработчик событий замены акивного маркера по клику и появление своего попапа при нажатии Enter
     pinElement.addEventListener('keydown', function (evt) {
       if (evt.keyCode === ENTER_KEYCODE) {
-        window.showCard.next(pinElement, ad);
+        window.showCard.renderNextPopap(pinElement, ad);
       }
     });
     return pinElement;
@@ -58,7 +67,6 @@
 
   // ----- фильтрация данных с сервера ----- //
 
-  var DEBOUNCE_INTERVAL = 500;
   var lastTimeout;
   // функция для устранения 'дребезг'
   var debounce = function (fun) {
@@ -68,111 +76,80 @@
     lastTimeout = window.setTimeout(fun, DEBOUNCE_INTERVAL);
   };
 
-  var mapFilters = document.querySelector('.map__filters');
-  var filterHousingType = mapFilters.querySelector('#housing-type');
-  var filterPrice = mapFilters.querySelector('#housing-price');
-  var filterRooms = mapFilters.querySelector('#housing-rooms');
-  var filterGuests = mapFilters.querySelector('#housing-guests');
-  var filterFeatures = mapFilters.querySelector('#housing-features');
-  var checkedElements = filterFeatures.querySelectorAll('input[type="checkbox"]:checked'); // Получаем список выделенных чекбоксов
-  var checkedFeatures = []; // выделенные удобства
-  var filterValue = { // объект c текущими значениями фильтров
-    type: 'any',
-    price: 'any',
-    rooms: 'any',
-    guests: 'any'
-  };
-  var dataCopy = []; // копия данных полученных с сервера
-
-  // Массив с функциями фильтров
-  var ArrWithFunctionsFilters = [
-    function (arr) { // по типу жилья
-      if (filterValue.type !== 'any') {
-        arr = arr.filter(function (element) {
-          return element.offer.type === filterValue.type;
-        });
-      }
-      return arr;
-    },
-
-    function (arr) { // по цене жилья
-      if (filterValue.price !== 'any') {
-        if (filterValue.price === 'low') {
-          arr = arr.filter(function (element) {
-            return element.offer.price <= 10000;
-          });
-        } else if (filterValue.price === 'high') {
-          arr = arr.filter(function (element) {
-            return element.offer.price >= 50000;
-          });
-        } else {
-          arr = arr.filter(function (element) {
-            return (element.offer.price > 10000) && (element.offer.price < 50000);
-          });
-        }
-      }
-      return arr;
-    },
-
-    function (arr) { // по количеству комнат
-      if (filterValue.rooms !== 'any') {
-        arr = arr.filter(function (element) {
-          return element.offer.rooms === parseInt(filterValue.rooms, 10);
-        });
-      }
-      return arr;
-    },
-
-    function (arr) { // по количеству гостей
-      if (filterValue.guests !== 'any') {
-        arr = arr.filter(function (element) {
-          return element.offer.guests === parseInt(filterValue.guests, 10);
-        });
-      }
-      return arr;
-    },
-
-    function (arr) { // по перечню удобств
-      return arr.filter(function (element) {
-        return checkedFeatures.every(function (elem) {
-          return element.offer.features.indexOf(elem) >= 0;
-        });
+  // по типу жилья
+  var selectTypeFilter = function (option) {
+    if (option.value !== 'any') {
+      dataCopy = dataCopy.filter(function (element) {
+        return element.offer.type.toString() === option.value;
       });
     }
-  ];
-
-  // Функция фильтрации
-  var updateMap = function (evt) {
-    // Текущее значение фильтров меняется после сработавшего фильтра
-    var filterName = evt.target.name.substring(6); // напр. HousingType
-    filterValue[filterName] = evt.target.value;
-
-    // Копируем исходные данные с сервера для фильтрования
-    var dataFiltered = dataCopy.slice();
-
-    // Преобразуем список отмеченных чекбоксов в массив строк
-    checkedFeatures = [].map.call(checkedElements, function (element) {
-      return element.value;
-    });
-
-    // Массив с функциями фильтров пропускаем через фильрованные данных (обработка системой фильтров)
-    ArrWithFunctionsFilters.forEach(function (element) {
-      dataFiltered = element(dataFiltered);
-    });
-
-    // устанавливаем необходимую длину для полученного массива
-    if (dataFiltered.length > MAX_PINS) {
-      dataFiltered = dataFiltered.slice(0, MAX_PINS + 1);
-    }
-    debounce(addPins); // "дребезг" для добавления пинов на карту
   };
 
-  // обработчики событий изменённых фильтров
-  filterHousingType.addEventListener('change', updateMap);
-  filterPrice.addEventListener('change', updateMap);
-  filterRooms.addEventListener('change', updateMap);
-  filterGuests.addEventListener('change', updateMap);
-  filterFeatures.addEventListener('change', updateMap);
+  // по цене жилья
+  var selectPriceFilter = function (arr) {
+    dataCopy = dataCopy.filter(function (element) {
+      if (arr.value === 'middle') {
+        return (element.offer.price < 50000) && (element.offer.price > 10000);
+      } else if (arr.value === 'low') {
+        return element.offer.price <= 10000;
+      } else if (arr.value === 'high') {
+        return element.offer.price >= 50000;
+      }
+      return true;
+    });
+  };
+
+  // по количеству комнат
+  var selectRoomsFilter = function (option) {
+    if (option.value !== 'any') {
+      dataCopy = dataCopy.filter(function (element) {
+        return element.offer.rooms.toString() === option.value;
+      });
+    }
+  };
+
+  // по количеству гостей
+  var selectGuestsFilter = function (option) {
+    if (option.value !== 'any') {
+      dataCopy = dataCopy.filter(function (element) {
+        return element.offer.guests.toString() === option.value;
+      });
+    }
+  };
+
+  // по перечню удобств
+  var selectFeaturesFilter = function (arr) {
+    [].forEach.call(arr, function (checkbox) {
+      if (checkbox.checked) {
+        dataCopy = dataCopy.filter(function (elem) {
+          return elem.offer.features.indexOf(checkbox.value) >= 0;
+        });
+      }
+    });
+  };
+
+  // Функция фильтрации
+  var updateMap = function () {
+    document.querySelector('.map__pin').classList.add('hidden'); // убирает пины из карты кроме pin_main
+    selectTypeFilter(filterHousingType);
+    selectPriceFilter(filterPrice);
+    selectRoomsFilter(filterRooms);
+    selectGuestsFilter(filterGuests);
+    selectFeaturesFilter(filterFeatures);
+    dataCopy = dataCopy.slice(0, MAX_PINS); // устанавливаем необходимую длину для полученного массива
+    addPins(dataCopy); // ПРАВИЛЬНО - ?
+  };
+
+  var useFilters = function (adsLoaded) {
+    // adsLoaded = []; // ПРАВИЛЬНО - ?
+    adsLoaded = adsLoaded.slice(); // создаём копию загруженных данных
+    // функция для применения фильтров
+    function onSelectChange() {
+      dataCopy = adsLoaded.slice(); // данным из сервера перед каждой фильтрации даём загруженные данные
+      window.pin.debounce(updateMap); // "дребезг" для функции фильтрации
+    }
+    mapFilters.addEventListener('change', onSelectChange); // обработчик событий изменённых фильтров
+  };
 
   // перенос в глобальную область видимости
   window.pin = {
@@ -180,6 +157,8 @@
     renderPoint: renderPoint,
     init: init,
     addPins: addPins,
-    updateMap: updateMap
+    dataCopy: dataCopy,
+    debounce: debounce,
+    useFilters: useFilters
   };
 })();

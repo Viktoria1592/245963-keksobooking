@@ -40,12 +40,12 @@
     pinElement.className = 'map__pin'; // задал имя классу
     // обработчик событий замены акивного маркера по клику и появление своего попапа
     pinElement.addEventListener('click', function () {
-      window.showCard.next(pinElement, ad);
+      window.showCard.renderNextPopap(pinElement, ad);
     });
     // обработчик событий замены акивного маркера по клику и появление своего попапа при нажатии Enter
     pinElement.addEventListener('keydown', function (evt) {
       if (evt.keyCode === ENTER_KEYCODE) {
-        window.showCard.next(pinElement, ad);
+        window.showCard.renderNextPopap(pinElement, ad);
       }
     });
     return pinElement;
@@ -137,11 +137,11 @@
     selectGuestsFilter(filterGuests);
     selectFeaturesFilter(filterFeatures);
     dataCopy = dataCopy.slice(0, MAX_PINS); // устанавливаем необходимую длину для полученного массива
-    addPins(dataCopy); // ПРАВИЛЬНО - ??
+    addPins(dataCopy); // ПРАВИЛЬНО - ?
   };
 
   var useFilters = function (adsLoaded) {
-    // adsLoaded = []; // ПРАВИЛЬНО - ??
+    // adsLoaded = []; // ПРАВИЛЬНО - ?
     adsLoaded = adsLoaded.slice(); // создаём копию загруженных данных
     // функция для применения фильтров
     function onSelectChange() {

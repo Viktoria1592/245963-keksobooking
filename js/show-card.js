@@ -2,11 +2,10 @@
 
 // модуль для показа карточки выбранного жилья по нажатию на метку на карте
 (function () {
-  // Отрисовка DOM-элемент маркера отелей и вставка
-  var map = document.querySelector('.map'); // общая поле = карта + настройки
-  var mapPins = map.querySelector('.map__pins'); // находим элемент-карту в которую отрисовываем сгенерированные DOM-элементы
   var ENTER_KEYCODE = 13;
   var ESC_KEYCODE = 27;
+  var map = document.querySelector('.map'); // общая поле = карта + настройки
+  var mapPins = map.querySelector('.map__pins'); // находим элемент-карту в которую отрисовываем сгенерированные DOM-элементы
 
   // функция снятия класса активного маркера
   var removeActive = function () {
@@ -33,7 +32,7 @@
   };
 
   // закрываем попап Enter и убираем активный класс
-  var onCloseEnterPress = function (evt) {
+  var onEnterClosePopap = function (evt) {
     if (evt.keyCode === ENTER_KEYCODE) {
       removeActive();
       hideArticle();
@@ -58,7 +57,7 @@
     articleElement.querySelector('.popup__avatar').src = ad.author.avatar; // Заменяем аватарку пользователя
     articleElement.querySelector('h3').textContent = ad.offer.title;
     articleElement.querySelector('small').textContent = ad.offer.address;
-    articleElement.querySelector('.popup__price').innerHTML = ad.offer.price + ' &#x20bd;/ночь';
+    articleElement.querySelector('.popup__price').textContent = ad.offer.price + '\u20BD/ночь';
     articleElement.querySelector('h4').textContent = ad.offer.type;
     articleElement.querySelector('p:nth-of-type(3)').textContent = ad.offer.rooms + ' комнат для ' + ad.offer.guests + ' гостей';
     articleElement.querySelector('p:nth-of-type(4)').textContent = 'Заезд после ' + ad.offer.checkin + ', выезд до ' + ad.offer.checkout;
@@ -81,13 +80,13 @@
       hideArticle();
     });
     // обработчик события закрытия попапа и убирает активный класс при нажатии Enter
-    closePopupItem.addEventListener('keydown', onCloseEnterPress);
+    closePopupItem.addEventListener('keydown', onEnterClosePopap);
     closePopupItem.tabIndex = 1;
     mapPins.appendChild(articleElement); // на карту добавить отрисованный попап
   };
 
   // функция отрисовывает новый попап по активному пину
-  var next = function (element, card) {
+  var renderNextPopap = function (element, card) {
     removeActive(); // снимает активный класс у кого находит при клике на маркер
     hideArticle(); // скрывает текущий попап
     element.classList.add('map__pin--active'); // отрисовка попапа соответствующего нажатому маркеру
@@ -98,6 +97,6 @@
   window.showCard = {
     renderArticle: renderArticle,
     onPopupEscPress: onPopupEscPress,
-    next: next
+    renderNextPopap: renderNextPopap
   };
 })();

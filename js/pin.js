@@ -7,8 +7,8 @@
   var DEBOUNCE_INTERVAL = 500;
   // Находим шаблон маркера в template, который будем копировать
   var mapPinTemplate = document.querySelector('template').content.querySelector('.map__pin');
-  var mapPin = document.querySelector('.map__pin');
-  var mapPinMain = mapPin.querySelector('#tophalf');
+  // var mapPin = document.querySelector('.map__pin');
+  var mapPinMain = document.querySelector('.map__pin--main');
   var pinWidth = 40; // ширина иконки
   var pinHeight = 40; // высота иконки
 
@@ -31,8 +31,10 @@
   };
 
   // Создает DOM-элемент маркера на основе шаблона и данных объявления
-  var renderPoint = function (ad) {
+  var renderPoint = function (ad, index) {
     var pinElement = mapPinTemplate.cloneNode(true); // клонируем содержимое маркера из template
+    ad.id = index; // каждому пину даём id
+    pinElement.setAttribute('dataid', index);
     pinElement.querySelector('img').width = pinWidth;
     pinElement.querySelector('img').height = pinHeight;
     pinElement.style.left = getPinWidth(ad.location.x) + 'px';
@@ -59,7 +61,11 @@
   var init = function () {
     var ads = window.data.get(); // возвращает новые пины из модуля data
     for (var i = 0; i < ads.length; i++) {
-      fragment.appendChild(renderPoint(ads[i])); // рендорим в массив-объявлений маркеры, каждому объявлению по маркеру
+      var pin = renderPoint(ads[i], i);
+      fragment.appendChild(pin); // рендорим в массив-объявлений маркеры, каждому объявлению по маркеру
+      if (i >= MAX_PINS) {
+        pin.classList.add('hidden');
+      }
     }
   };
   // функция добавления пинов на карту, хранящихся в fragment
@@ -132,8 +138,24 @@
 
   // убирает пины из карты кроме pin_main
   var deletePins = function () {
-    if (!mapPin.contains(mapPinMain)) {
-      mapPin.classList.add('hidden');
+    var elementsPins = document.querySelectorAll('.map__pin');
+    for (var i = 0; i < elementsPins.length; i++) {
+      if (elementsPins[i] !== mapPinMain) {
+        elementsPins[i].classList.add('hidden');
+      }
+    }
+  };
+
+  // Отображение отфильтрованых 5 пинов
+  var showPins = function (pins) {
+    var elementsPins = document.querySelectorAll('.map__pin');
+    for (var i = 0; i < elementsPins.length; i++) {
+      var matchCount = pins.filter(function (element) {
+        return parseInt(element.id, 10) === parseInt(elementsPins[i].getAttribute('dataid'), 10);
+      }).length;
+      if (matchCount !== 0) {
+        elementsPins[i].classList.remove('hidden');
+      }
     }
   };
 
@@ -146,11 +168,10 @@
     selectGuestsFilter(filterGuests);
     selectFeaturesFilter(filterFeatures);
     dataCopy = dataCopy.slice(0, MAX_PINS); // устанавливаем необходимую длину для полученного массива
-    addPins(dataCopy); // ПРАВИЛЬНО - ?
+    showPins(dataCopy);
   };
 
   var useFilters = function (adsLoaded) {
-    // adsLoaded = []; // ПРАВИЛЬНО - ?
     adsLoaded = adsLoaded.slice(); // создаём копию загруженных данных
     // функция для применения фильтров
     function onSelectChange() {

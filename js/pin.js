@@ -7,6 +7,8 @@
   var DEBOUNCE_INTERVAL = 500;
   // Находим шаблон маркера в template, который будем копировать
   var mapPinTemplate = document.querySelector('template').content.querySelector('.map__pin');
+  var mapPin = document.querySelector('.map__pin');
+  var mapPinMain = mapPin.querySelector('#tophalf');
   var pinWidth = 40; // ширина иконки
   var pinHeight = 40; // высота иконки
 
@@ -128,9 +130,16 @@
     });
   };
 
+  // убирает пины из карты кроме pin_main
+  var deletePins = function () {
+    if (!mapPin.contains(mapPinMain)) {
+      mapPin.classList.add('hidden');
+    }
+  };
+
   // Функция фильтрации
   var updateMap = function () {
-    document.querySelector('.map__pin').classList.add('hidden'); // убирает пины из карты кроме pin_main
+    deletePins();
     selectTypeFilter(filterHousingType);
     selectPriceFilter(filterPrice);
     selectRoomsFilter(filterRooms);

@@ -13,23 +13,6 @@
   var ads = []; // переменная объявлений
   window.backend.load(window.backend.successHandler, window.backend.errorHandler); // загрузка данных с сервера сразу
 
-  // функция рандома возвращает случайное число в заданном пределе
-  var getRandomNumber = function (min, max) {
-    return Math.round(Math.random() * (max - min) + min);
-  };
-
-  // создаю шаблон объекта, который будет описывать похожие объявления
-  var objectOfAds = function () {
-    var locationX = getRandomNumber(locationXY.minX, locationXY.maxX);
-    var locationY = getRandomNumber(locationXY.minY, locationXY.maxY);
-    return {
-      'location': {
-        x: locationX,
-        y: locationY
-      }
-    };
-  };
-
   // возвращает переменную объявлений
   var get = function () {
     return ads;
@@ -42,8 +25,6 @@
 
   // перенос в глобальную область видимости
   window.data = {
-    // getRandomNumber: getRandomNumber,
-    objectOfAds: objectOfAds,
     locationXY: locationXY,
     CHECKINS: CHECKINS,
     CHECKOUTS: CHECKOUTS,

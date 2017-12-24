@@ -58,7 +58,7 @@
           mapPinMain.style.top = window.data.locationXY.maxY + 'px';
           locationMainInForm.y = window.data.locationXY.maxY;
         } else if (newY < window.data.locationXY.minY) {
-          mapPinMain.style.top = window.data.locationXY.minY + '100 px';
+          mapPinMain.style.top = window.data.locationXY.minY + 'px';
           locationMainInForm.y = window.data.locationXY.minY;
         } else {
           mapPinMain.style.top = newY + 'px'; // отображение текущей координаты у
@@ -98,7 +98,6 @@
     window.pin.init(); // инициализация пинов
     window.pin.addPins(); // выводит пины на карту
     activate(); // активирует карту и форму
-    // window.showCard.renderArticle(window.data.get()[0]); // отрисовываем 1й попап по умолчанию из массива объявлений ??
     for (var i = 0; i < formFieldset.length; i++) {
       formFieldset[i].removeAttribute('disabled');
     }

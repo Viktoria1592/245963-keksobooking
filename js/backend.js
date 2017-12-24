@@ -2,7 +2,6 @@
 
 // модуль функций для работаты с сервером данных
 (function () {
-  var ESC_KEYCODE = 27;
   var SERVER_URL = 'https://1510.dump.academy/keksobooking';
   var divMessage = document.createElement('div');
 
@@ -27,7 +26,7 @@
 
   // закрытие сообщения об ошибке ESC
   document.addEventListener('keydown', function (evt) {
-    if (evt.keyCode === ESC_KEYCODE) {
+    if (evt.keyCode === window.util.ESC_KEYCODE) {
       divMessage.classList.add('hidden');
     }
   });

@@ -2,7 +2,6 @@
 
 // модуль, который работает с формой объявления
 (function () {
-  var ESC_KEYCODE = 27;
   var noticeForm = document.querySelector('.notice__form');
   var checkIn = noticeForm.querySelector('#timein');
   var checkOut = noticeForm.querySelector('#timeout');
@@ -14,6 +13,7 @@
     house: 5000,
     palace: 10000
   };
+  var keysOfMinPriceForTypes = Object.keys(minPriceForTypes); // массив ключей из массива minPriceForTypes
   var roomNumber = noticeForm.querySelector('#room_number');
   var capacity = noticeForm.querySelector('#capacity');
   var сapacityOfRooms = {
@@ -44,12 +44,12 @@
 
   // Событие изменения времени выезда
   checkIn.addEventListener('change', function () {
-    window.synchronizeFields(checkOut, checkIn, window.data.CHECKOUT, window.data.CHECKIN, syncValues); // изменяется порядковый номер выбранного элемента
+    window.synchronizeFields(checkOut, checkIn, window.data.CHECKOUTS, window.data.CHECKINS, syncValues); // изменяется порядковый номер выбранного элемента
   });
 
   // Событие изменения времени въезда
   checkOut.addEventListener('change', function () {
-    window.synchronizeFields(checkIn, checkOut, window.data.CHECKIN, window.data.CHECKOUT, syncValues);
+    window.synchronizeFields(checkIn, checkOut, window.data.CHECKINS, window.data.CHECKOUTS, syncValues);
   });
 
   // ----- Функция синхронизации типа жилья и минимальной цены ----- //
@@ -58,21 +58,18 @@
     element.min = value;
   };
 
-  // массив ключей из массива minPriceForTypes
-  var arrOfTypes = Object.keys(minPriceForTypes);
-
   // массив значений ключей из массива minPriceForTypes
   var getValues = function (keys, object) {
-    var arr = [];
+    var valuesKeys = [];
     for (var i = 0; i < keys.length; i++) {
-      arr.push(object[keys[i]]);
+      valuesKeys.push(object[keys[i]]);
     }
-    return arr;
+    return valuesKeys;
   };
 
   // обработчик cобытия изменения мин цены для типов жилья
   typeOfAccommodation.addEventListener('change', function () {
-    window.synchronizeFields(priceForNight, typeOfAccommodation, getValues(arrOfTypes, minPriceForTypes), arrOfTypes, syncValueWithMin);
+    window.synchronizeFields(priceForNight, typeOfAccommodation, getValues(keysOfMinPriceForTypes, minPriceForTypes), keysOfMinPriceForTypes, syncValueWithMin);
   });
 
   // обработчиками валидации введенной суммы
@@ -92,22 +89,17 @@
 
   // ----- обратобчик события соответствия кол-ва комнат и мест ----- //
 
-  roomNumber.addEventListener('change', function () {
+  var synchronizeRoomsAndCapacities = function () {
     if (capacity.options.length > 0) {
       [].forEach.call(capacity.options, function (item) {
-        if (сapacityOfRooms[roomNumber.value][0] === item.value) { // пример: сapacityOfRooms[2][0] = '3', - третему и второму и первому дочерн эл-тов capacity.options
-          item.selected = true;
-        } else {
-          item.selected = false; // остальные не выбраны
-        }
-        if (сapacityOfRooms[roomNumber.value].indexOf(item.value) >= 0) { // пример: сapacityOfRooms[2].indexOf(все значения option перебираются)
-          item.hidden = false;
-        } else {
-          item.hidden = true; // если какого значения option нет в значении ключа сapacityOfRooms - оно скрывается
-        }
+        item.selected = (сapacityOfRooms[roomNumber.value][0] === item.value) ? true : false; // пример: сapacityOfRooms[2][0] = '3', - третему и второму и первому дочерн эл-тов capacity.options
+        item.hidden = (сapacityOfRooms[roomNumber.value].indexOf(item.value) >= 0) ? false : true; // пример: сapacityOfRooms[2].indexOf(все значения option перебираются). если какого значения option нет в значении ключа сapacityOfRooms - оно скрывается
       });
     }
-  });
+  };
+  synchronizeRoomsAndCapacities();
+
+  roomNumber.addEventListener('change', synchronizeRoomsAndCapacities);
 
   // ----- Обработчик для работы с сервером ----- //
 
@@ -126,7 +118,7 @@
 
   // закрытие сообщения об отправке данных ESC
   document.addEventListener('keydown', function (evt) {
-    if (evt.keyCode === ESC_KEYCODE) {
+    if (evt.keyCode === window.util.ESC_KEYCODE) {
       nodeDiv.classList.add('hidden');
     }
   });

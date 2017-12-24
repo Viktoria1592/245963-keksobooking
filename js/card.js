@@ -7,9 +7,9 @@
   var articleElement = mapCardTemplate.cloneNode(true);
 
   // возвращает шаблон объявления
-  function get() {
+  var get = function () {
     return articleElement;
-  }
+  };
 
   // перенос в глобальную область видимости
   window.card = {

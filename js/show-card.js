@@ -2,8 +2,6 @@
 
 // модуль для показа карточки выбранного жилья по нажатию на метку на карте
 (function () {
-  var ENTER_KEYCODE = 13;
-  var ESC_KEYCODE = 27;
   var map = document.querySelector('.map'); // общая поле = карта + настройки
   var mapPins = map.querySelector('.map__pins'); // находим элемент-карту в которую отрисовываем сгенерированные DOM-элементы
 
@@ -25,7 +23,7 @@
 
   // закрываем попап Esc и убираем активный класс
   var onPopupEscPress = function (evt) {
-    if (evt.keyCode === ESC_KEYCODE) {
+    if (evt.keyCode === window.util.ESC_KEYCODE) {
       removeActive();
       hideArticle();
     }
@@ -33,7 +31,7 @@
 
   // закрываем попап Enter и убираем активный класс
   var onEnterClosePopap = function (evt) {
-    if (evt.keyCode === ENTER_KEYCODE) {
+    if (evt.keyCode === window.util.ENTER_KEYCODE) {
       removeActive();
       hideArticle();
     }
@@ -97,6 +95,7 @@
   window.showCard = {
     renderArticle: renderArticle,
     onPopupEscPress: onPopupEscPress,
-    renderNextPopap: renderNextPopap
+    renderNextPopap: renderNextPopap,
+    hideArticle: hideArticle
   };
 })();

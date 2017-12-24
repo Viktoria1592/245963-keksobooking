@@ -2,7 +2,6 @@
 
 // модуль, который работает с картой
 (function () {
-  var ENTER_KEYCODE = 13;
   var noticeForm = document.querySelector('.notice__form');
   var address = noticeForm.querySelector('#address');
   var formFieldset = document.querySelectorAll('fieldset');
@@ -43,11 +42,11 @@
         };
 
         var newX = mapPinMain.offsetLeft - shift.x; // переменная для отображения положения текущего пина по оси абсцисс
-        if (newX > window.data.locationXY.maxX) { // ограничения для пина на крте по оси абсцисс
-          mapPinMain.style.left = '900 px';
+        if (newX > window.data.locationXY.maxX) { // ограничения для пина на кaрте по оси абсцисс
+          mapPinMain.style.left = window.data.locationXY.maxX + 'px';
           locationMainInForm.x = window.data.locationXY.maxX;
         } else if (newX < window.data.locationXY.minX) {
-          mapPinMain.style.left = '300 px';
+          mapPinMain.style.left = window.data.locationXY.minX + 'px';
           locationMainInForm.x = window.data.locationXY.minX;
         } else {
           mapPinMain.style.left = newX + 'px'; // отображение текущей координаты х
@@ -56,10 +55,10 @@
 
         var newY = mapPinMain.offsetTop - shift.y; // переменная для отображения положения текущего пина по оси ординат
         if (newY > window.data.locationXY.maxY) { // ограничения для пина на крте по оси ординат
-          mapPinMain.style.top = '500 px';
+          mapPinMain.style.top = window.data.locationXY.maxY + 'px';
           locationMainInForm.y = window.data.locationXY.maxY;
         } else if (newY < window.data.locationXY.minY) {
-          mapPinMain.style.top = '100 px';
+          mapPinMain.style.top = window.data.locationXY.minY + '100 px';
           locationMainInForm.y = window.data.locationXY.minY;
         } else {
           mapPinMain.style.top = newY + 'px'; // отображение текущей координаты у
@@ -88,9 +87,9 @@
   // функция делает недоступными все поля форм по умолчанию
   var disabledMapAndForms = function () {
     map.classList.add('map--faded');
-    for (var i = 0; i < formFieldset.length; i++) {
-      formFieldset[i].setAttribute('disabled', '');
-    }
+    formFieldset.forEach(function (el) {
+      el.setAttribute('disabled', '');
+    });
   };
   disabledMapAndForms();
 
@@ -99,7 +98,7 @@
     window.pin.init(); // инициализация пинов
     window.pin.addPins(); // выводит пины на карту
     activate(); // активирует карту и форму
-    window.showCard.renderArticle(window.data.get()[0]); // отрисовываем 1й попап по умолчанию из массива объявлений
+    // window.showCard.renderArticle(window.data.get()[0]); // отрисовываем 1й попап по умолчанию из массива объявлений ??
     for (var i = 0; i < formFieldset.length; i++) {
       formFieldset[i].removeAttribute('disabled');
     }
@@ -113,7 +112,7 @@
 
   // обработчик события на блоке при нажатии ENTER
   mapPinMain.addEventListener('keydown', function (evt) {
-    if (evt.keyCode === ENTER_KEYCODE) {
+    if (evt.keyCode === window.util.ENTER_KEYCODE) {
       onButtonActivateMap();
     }
   });
